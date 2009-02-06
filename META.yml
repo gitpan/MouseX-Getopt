@@ -20,8 +20,8 @@ no_index:
 requires:
   Filter::Util::Call: 0
   Getopt::Long: 0
-  Mouse: 0.14
+  Mouse: 0.15
   perl: 5.8.1
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.03
+version: 0.04
