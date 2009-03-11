@@ -2,13 +2,23 @@ use inc::Module::Install;
 name 'MouseX-Getopt';
 all_from 'lib/MouseX/Getopt.pm';
 
-requires 'Mouse' => '0.15';
+requires 'Mouse' => '0.19';
+requires 'Mouse::Role';
+requires 'Mouse::Meta::Attribute';
+requires 'Mouse::Util';
+requires 'Mouse::Util::TypeConstraints';
 requires 'Getopt::Long';
+requires 'Class::Method::Modifiers';
+requires 'Scalar::Util' => '1.14';
+requires 'Carp';
+
+recommends 'Class::Method::Modifiers::Fast';
 
 tests 't/*.t';
 test_requires 'Test::More';
-test_requires 'ok';
+test_requires 'Test::UseAllModules';
 test_requires 'Test::Deep';
+test_requires 'Test::Exception';
 author_tests 'xt';
 use_test_base;
 

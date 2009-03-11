@@ -3,6 +3,8 @@ use Config ();
 use File::Spec ();
 eval "use Test::Spelling";
 plan skip_all => "Test::Spelling is not installed." if $@;
+plan skip_all => "set TEST_POD or TEST_ALL to enable this test"
+    unless $ENV{TEST_POD} or $ENV{TEST_ALL};
 
 my $spell;
 for my $path (split /$Config::Config{path_sep}/ => $ENV{PATH}) {
@@ -22,4 +24,4 @@ MouseX::Getopt
 ARGV
 Str ClassName Int Num ArrayRef HashRef
 DWIM
-params configfile
+params configfile metaclass

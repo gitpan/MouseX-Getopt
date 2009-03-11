@@ -4,10 +4,11 @@ author:
   - 'NAKAGAWA Masaki <masaki@cpan.org>'
 build_requires:
   Test::Deep: 0
+  Test::Exception: 0
   Test::More: 0
-  ok: 0
+  Test::UseAllModules: 0
 distribution_type: module
-generated_by: 'Module::Install version 0.77'
+generated_by: 'Module::Install version 0.79'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,11 +18,20 @@ no_index:
   directory:
     - inc
     - t
+recommends:
+  Class::Method::Modifiers::Fast: 0
 requires:
+  Carp: 0
+  Class::Method::Modifiers: 0
   Filter::Util::Call: 0
   Getopt::Long: 0
-  Mouse: 0.15
+  Mouse: 0.19
+  Mouse::Meta::Attribute: 0
+  Mouse::Role: 0
+  Mouse::Util: 0
+  Mouse::Util::TypeConstraints: 0
+  Scalar::Util: 1.14
   perl: 5.8.1
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.04
+version: 0.05
