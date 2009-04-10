@@ -2,13 +2,12 @@ package MouseX::Getopt;
 
 use 5.008_001;
 use Mouse::Role;
-use Mouse::Util;
 use MouseX::Getopt::Meta::Attribute::Getopt;
 use MouseX::Getopt::Meta::Attribute::NoGetopt;
 use MouseX::Getopt::OptionTypeMap;
 use Getopt::Long ();
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 has 'ARGV'       => (is => 'rw', isa => 'ArrayRef', metaclass => 'NoGetopt');
 has 'extra_argv' => (is => 'rw', isa => 'ArrayRef', metaclass => 'NoGetopt');
@@ -21,12 +20,11 @@ sub new_with_options {
     {
         last unless grep {
             $_->can('meta') and $_->meta->does_role('MouseX::ConfigFromFile')
-        } @{ Mouse::Util::get_linear_isa($class) };
+        } $class->meta->linearized_isa;
 
         local @ARGV = @ARGV;
-        Getopt::Long::Parser->new(config => ['pass_through'])->getoptions(
-            'configfile=s', \my $file,
-        );
+        my $parser = Getopt::Long::Parser->new(config => ['pass_through']);
+        $parser->getoptions('configfile=s', \my $file);
 
         unless (defined $file) {
             my $attr = $class->meta->get_attribute('configfile');
@@ -104,7 +102,7 @@ sub _compute_getopt_attributes {
         $_->isa('MouseX::Getopt::Meta::Attribute::Getopt') or $_->name !~ /^_/
     } grep {
         not $_->isa('MouseX::Getopt::Meta::Attribute::NoGetopt')
-    } $class->meta->compute_all_applicable_attributes;
+    } $class->meta->get_all_attributes;
 }
 
 sub _compute_getopt_flags {
@@ -286,9 +284,9 @@ unmangled.
 
 =over 4
 
-=item C<traits> and C<metaclass> (C<Getopt>, C<NoGetopt>) are not supported.
+=item not supported C<traits> (Mouse 0.19).
 
-=item L<Getopt::Long::Descriptive> is not supported.
+=item not supported L<Getopt::Long::Descriptive>.
 
 =back
 

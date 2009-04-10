@@ -3,6 +3,8 @@ abstract: 'A Mouse role for processing command line options'
 author:
   - 'NAKAGAWA Masaki <masaki@cpan.org>'
 build_requires:
+  Any::Moose: 0.07
+  Path::Class: 0
   Test::Deep: 0
   Test::Exception: 0
   Test::More: 0
@@ -25,13 +27,12 @@ requires:
   Class::Method::Modifiers: 0
   Filter::Util::Call: 0
   Getopt::Long: 0
-  Mouse: 0.19
+  Mouse: 0.20
   Mouse::Meta::Attribute: 0
   Mouse::Role: 0
-  Mouse::Util: 0
   Mouse::Util::TypeConstraints: 0
   Scalar::Util: 1.14
   perl: 5.8.1
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.05
+version: 0.06
