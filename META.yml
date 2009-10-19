@@ -3,14 +3,13 @@ abstract: 'A Mouse role for processing command line options'
 author:
   - 'NAKAGAWA Masaki <masaki@cpan.org>'
 build_requires:
-  Any::Moose: 0.07
-  Path::Class: 0
-  Test::Deep: 0
-  Test::Exception: 0
-  Test::More: 0
-  Test::UseAllModules: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::Exception: 0.21
+  Test::More: 0.62
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 0.79'
+generated_by: 'Module::Install version 0.91'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,18 +20,12 @@ no_index:
     - inc
     - t
 recommends:
-  Class::Method::Modifiers::Fast: 0
+  Getopt::Long::Descriptive: 0.077
 requires:
-  Carp: 0
-  Class::Method::Modifiers: 0
-  Filter::Util::Call: 0
-  Getopt::Long: 0
-  Mouse: 0.20
-  Mouse::Meta::Attribute: 0
-  Mouse::Role: 0
-  Mouse::Util::TypeConstraints: 0
-  Scalar::Util: 1.14
+  Getopt::Long: 2.37
+  Mouse: 0.39
   perl: 5.8.1
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.06
+  repository: git://github.com/gfx/Perl-MouseX-Getopt.git
+version: 0.2200

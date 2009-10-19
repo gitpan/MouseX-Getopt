@@ -1,16 +1,12 @@
-package MouseX::Getopt::Meta::Attribute::NoGetopt;
-use Mouse;
+package MouseX::Getopt::Meta::Attribute::Trait::NoGetopt;
+use Mouse::Role;
 
-
-extends 'Mouse::Meta::Attribute'; # << Mouse extending Mouse :)
-   with 'MouseX::Getopt::Meta::Attribute::Trait::NoGetopt';
-
-no Mouse;
+no Mouse::Role;
 
 # register this as a metaclass alias ...
 package # stop confusing PAUSE
-    Mouse::Meta::Attribute::Custom::NoGetopt;
-sub register_implementation { 'MouseX::Getopt::Meta::Attribute::NoGetopt' }
+    Mouse::Meta::Attribute::Custom::Trait::NoGetopt;
+sub register_implementation { 'MouseX::Getopt::Meta::Attribute::Trait::NoGetopt' }
 
 1;
 
@@ -20,7 +16,7 @@ __END__
 
 =head1 NAME
 
-MouseX::Getopt::Meta::Attribute::NoGetopt - Optional meta attribute for ignoring params
+MouseX::Getopt::Meta::Attribute::Trait::NoGetopt - Optional meta attribute trait for ignoring params
 
 =head1 SYNOPSIS
 
@@ -30,20 +26,20 @@ MouseX::Getopt::Meta::Attribute::NoGetopt - Optional meta attribute for ignoring
   with 'MouseX::Getopt';
   
   has 'data' => (
-      metaclass => 'NoGetopt',  # do not attempt to capture this param  
-      is        => 'ro',
-      isa       => 'Str',
-      default   => 'file.dat',
+      traits  => [ 'NoGetopt' ],  # do not attempt to capture this param  
+      is      => 'ro',
+      isa     => 'Str',
+      default => 'file.dat',
   );
 
 =head1 DESCRIPTION
 
-This is a custom attribute metaclass which can be used to specify 
-that a specific attribute should B<not> be processed by 
+This is a custom attribute metaclass trait which can be used to 
+specify that a specific attribute should B<not> be processed by 
 C<MouseX::Getopt>. All you need to do is specify the C<NoGetopt> 
-metaclass.
+metaclass trait.
 
-  has 'foo' => (metaclass => 'NoGetopt', ... );
+  has 'foo' => (traits => [ 'NoGetopt', ... ], ... );
 
 =head1 METHODS
 
@@ -58,6 +54,7 @@ metaclass.
 All complex software has bugs lurking in it, and this module is no 
 exception. If you find a bug please either email me, or add the bug
 to cpan-RT.
+
 
 =head1 AUTHOR
 
@@ -75,4 +72,5 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
+
 

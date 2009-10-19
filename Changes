@@ -1,23 +1,5 @@
-Revision history for Perl extension MouseX::Getopt
+Revision history for Perl extension MooseX-Getopt
 
-0.06
-        - use Mouse 0.20 (get_all_attributes)
+0.2200 Mon Oct 19 16:21:08 2009
+    - Forked from MooseX::Getopt 0.22
 
-0.05
-        - use Mouse 0.19 (metaclass support)
-        - added Getopt and NoGetopt metaclass
-        - search superclasses for config file loading
-        - works with 'MouseX::Getopt::Strict'
-        - optimized MouseX::Getopt::OptionTypeMap
-
-0.04
-        - use Mouse 0.15
-
-0.03
-        - support for config file loading via MouseX::ConfigFromFile
-
-0.02
-        - added extra_argv and ARGV attributes
-
-0.01
-        - original version
