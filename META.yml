@@ -19,13 +19,12 @@ no_index:
   directory:
     - inc
     - t
-recommends:
-  Getopt::Long::Descriptive: 0.077
 requires:
   Getopt::Long: 2.37
+  Getopt::Long::Descriptive: 0.077
   Mouse: 0.39
   perl: 5.8.1
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/gfx/Perl-MouseX-Getopt.git
-version: 0.2200
+version: 0.2201

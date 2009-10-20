@@ -2,15 +2,13 @@ package MouseX::Getopt;
 use 5.008_001;
 use Mouse::Role;
 
-our $VERSION   = '0.2200';
+our $VERSION   = '0.2201';
 
 use MouseX::Getopt::OptionTypeMap;
 use MouseX::Getopt::Meta::Attribute;
 use MouseX::Getopt::Meta::Attribute::NoGetopt;
 
-use Getopt::Long (); # GLD uses it anyway, doesn't hurt
-use constant HAVE_GLD => eval { require Getopt::Long::Descriptive; 1 };
-
+use Getopt::Long::Descriptive;
 
 has ARGV       => (is => 'rw', isa => 'ArrayRef', metaclass => "NoGetopt");
 has extra_argv => (is => 'rw', isa => 'ArrayRef', metaclass => "NoGetopt");
@@ -76,7 +74,7 @@ sub _parse_argv {
 
     local @ARGV = @{ $params{params}{argv} || \@ARGV };
 
-    my ( $opt_spec, $name_to_init_arg ) = ( HAVE_GLD ? $class->_gld_spec(%params) : $class->_traditional_spec(%params) );
+    my ( $opt_spec, $name_to_init_arg ) = $class->_gld_spec(%params);
 
     # Get a clean copy of the original @ARGV
     my $argv_copy = [ @ARGV ];
@@ -86,13 +84,7 @@ sub _parse_argv {
     my ( $parsed_options, $usage ) = eval {
         local $SIG{__WARN__} = sub { push @err, @_ };
 
-        if ( HAVE_GLD ) {
-            return Getopt::Long::Descriptive::describe_options($class->_usage_format(%params), @$opt_spec);
-        } else {
-            my %options;
-            Getopt::Long::GetOptions(\%options, @$opt_spec);
-            return ( \%options, undef );
-        }
+        Getopt::Long::Descriptive::describe_options($class->_usage_format(%params), @$opt_spec);
     };
 
     die join "", grep { defined } @err, $@ if @err or $@;

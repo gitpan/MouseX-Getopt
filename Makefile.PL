@@ -13,9 +13,7 @@ all_from 'lib/MouseX/Getopt.pm';
 
 requires 'Mouse'        => '0.39';
 requires 'Getopt::Long' => '2.37';
-
-# optional
-recommends 'Getopt::Long::Descriptive' => '0.077';
+requires 'Getopt::Long::Descriptive' => '0.077';
 
 test_requires 'Test::More'       => '0.62';
 test_requires 'Test::Exception'  => '0.21';
