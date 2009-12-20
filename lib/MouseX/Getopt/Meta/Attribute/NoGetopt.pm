@@ -1,6 +1,9 @@
+
 package MouseX::Getopt::Meta::Attribute::NoGetopt;
 use Mouse;
 
+our $VERSION   = '0.2600';
+our $AUTHORITY = 'cpan:STEVAN';
 
 extends 'Mouse::Meta::Attribute'; # << Mouse extending Mouse :)
    with 'MouseX::Getopt::Meta::Attribute::Trait::NoGetopt';
@@ -61,18 +64,17 @@ to cpan-RT.
 
 =head1 AUTHOR
 
-NAKAGAWA Masaki E<lt>masaki@cpan.orgE<gt>
+Stevan Little E<lt>stevan@iinteractive.comE<gt>
 
-FUJI Goro E<lt>gfuji@cpan.orgE<gt> from 0.22
+Chris Prather  C<< <perigrin@cpan.org> >>
 
-=head1 OROGINAL AUTHOR
+=head1 COPYRIGHT AND LICENSE
 
-See L<MooseX::Getopt/AUTHOR> and L<MooseX::Getopt/CONTRIBUTORS>.
+Copyright 2007-2008 by Infinity Interactive, Inc.
 
-=head1 LICENSE
+L<http://www.iinteractive.com>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 =cut
-

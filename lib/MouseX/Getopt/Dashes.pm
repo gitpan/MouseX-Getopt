@@ -46,25 +46,8 @@ attribute names to dashes when generating command line flags.
 
 =back
 
-=head1 BUGS
+=head1 SEE ALSO
 
-All complex software has bugs lurking in it, and this module is no
-exception. If you find a bug please either email me, or add the bug
-to cpan-RT.
-
-=head1 AUTHOR
-
-NAKAGAWA Masaki E<lt>masaki@cpan.orgE<gt>
-
-FUJI Goro E<lt>gfuji@cpan.orgE<gt> from 0.22
-
-=head1 OROGINAL AUTHOR
-
-See L<MooseX::Getopt/AUTHOR> and L<MooseX::Getopt/CONTRIBUTORS>.
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+L<MouseX::Getopt>
 
 =cut

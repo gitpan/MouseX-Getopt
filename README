@@ -1,27 +1,30 @@
-This is Perl module MouseX::Getopt.
+MouseX::Getopt version 0.26
+===========================
+
+See the individual module documentation for more information
 
 INSTALLATION
 
-MouseX::Getopt installation is straightforward. If your CPAN shell is set up,
-you should just be able to do
+To install this module type the following:
 
-    % cpan MouseX::Getopt
+   perl Makefile.PL
+   make
+   make test
+   make install
 
-Download it, unpack it, then build it as per the usual:
+DEPENDENCIES
 
-    % perl Makefile.PL
-    % make && make test
+This module requires these other modules and libraries:
 
-Then install it:
+    Mouse
+    Getopt::Long
 
-    % make install
+COPYRIGHT AND LICENCE
 
-DOCUMENTATION
+Copyright (C) 2007-2009 Infinity Interactive, Inc.
 
-MouseX::Getopt documentation is available as in POD. So you can do:
+http://www.iinteractive.com
 
-    % perldoc MouseX::Getopt
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
 
-to read the documentation online with your favorite pager.
-
-NAKAGAWA Masaki

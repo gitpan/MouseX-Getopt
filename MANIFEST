@@ -37,5 +37,9 @@ t/010_dashes.t
 t/100_gld_default_bug.t
 t/101_argv_bug.t
 t/102_basic_basic.t
+t/103_uc_bug.t
+t/104_override_usage.t
+t/105_uc_bug_more.t
+t/106_no_ignore_case.t
 t/author/pod.t
 t/author/pod_coverage.t

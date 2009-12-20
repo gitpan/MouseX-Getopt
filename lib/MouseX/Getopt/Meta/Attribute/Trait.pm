@@ -12,7 +12,7 @@ has 'cmd_flag' => (
 # This subtype is to support scalar -> arrayref coercion
 #  without polluting the built-in types
 subtype '_MouseX_Getopt_CmdAliases' => as 'ArrayRef';
-
+    
 coerce '_MouseX_Getopt_CmdAliases'
     => from 'Str'
         => via { [$_] };
@@ -25,7 +25,6 @@ has 'cmd_aliases' => (
 );
 
 no Mouse::Role;
-no Mouse::Util::TypeConstraints;
 
 # register this as a metaclass alias ...
 package # stop confusing PAUSE 
@@ -100,27 +99,8 @@ and such.
 
 =back
 
-=head1 BUGS
+=head1 SEE ALSO
 
-All complex software has bugs lurking in it, and this module is no 
-exception. If you find a bug please either email me, or add the bug
-to cpan-RT.
-
-
-=head1 AUTHOR
-
-NAKAGAWA Masaki E<lt>masaki@cpan.orgE<gt>
-
-FUJI Goro E<lt>gfuji@cpan.orgE<gt> from 0.22
-
-=head1 OROGINAL AUTHOR
-
-See L<MooseX::Getopt/AUTHOR> and L<MooseX::Getopt/CONTRIBUTORS>.
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+L<MouseX::Getopt>
 
 =cut
-

@@ -1,25 +1,21 @@
-package MouseX::Getopt::GLD;
 
+package MouseX::Getopt::GLD;
 use Mouse::Role;
 
-around '_getopt_spec' => sub {
-    my $orig = shift;
-    my $self = shift;
+use Getopt::Long::Descriptive;
 
-    return $self->_gld_spec(@_);
-    # Ignore $orig, code for _gld_spec here
+with 'MouseX::Getopt::Basic';
+
+around _getopt_spec => sub {
+    shift;
+    shift->_gld_spec(@_);
 };
 
-around '_get_options' => sub {
-    my $orig = shift;
-    my $class = shift;
-
-    my ($params, $opt_spec) = @_;
-    return Getopt::Long::Descriptive::describe_options(
-        $class->_usage_format(%$params), @$opt_spec
-    );
+around _getopt_get_options => sub {
+    shift;
+    my ($class, $params, $opt_spec) = @_;
+    return Getopt::Long::Descriptive::describe_options($class->_usage_format(%$params), @$opt_spec);
 };
-
 
 sub _gld_spec {
     my ( $class, %params ) = @_;
@@ -44,7 +40,7 @@ sub _gld_spec {
             },
         ];
 
-        my $identifier = $opt->{name};
+        my $identifier = lc($opt->{name});
         $identifier =~ s/\W/_/g; # Getopt::Long does this to all option names
 
         $name_to_init_arg{$identifier} = $opt->{init_arg};
@@ -53,8 +49,7 @@ sub _gld_spec {
     return ( \@options, \%name_to_init_arg );
 }
 
-no Mouse::Role;
-1;
+no Mouse::Role; 1;
 
 __END__
 
@@ -62,44 +57,34 @@ __END__
 
 =head1 NAME
 
-MouseX::Getopt::GLD - role to implement specific functionality for 
-L<Getopt::Long::Descriptive>
+MouseX::Getopt::GLD - A Mouse role for processing command line options with Getopt::Long::Descriptive
 
 =head1 SYNOPSIS
-    
-For internal use.
 
-=head1 DESCRIPTION
+  ## In your class
+  package My::App;
+  use Mouse;
 
-This is a role for C<MouseX::Getopt>.
+  with 'MouseX::Getopt::GLD';
 
-=head1 METHODS
+  has 'out' => (is => 'rw', isa => 'Str', required => 1);
+  has 'in'  => (is => 'rw', isa => 'Str', required => 1);
 
-=over 4
+  # ... rest of the class here
 
-=item meta
+  ## in your script
+  #!/usr/bin/perl
 
-=back
+  use My::App;
 
-=head1 BUGS
+  my $app = My::App->new_with_options();
+  # ... rest of the script here
 
-All complex software has bugs lurking in it, and this module is no
-exception. If you find a bug please either email me, or add the bug
-to cpan-RT.
+  ## on the command line
+  % perl my_app_script.pl -in file.input -out file.dump
 
-=head1 AUTHOR
+=head1 SEE ALSO
 
-NAKAGAWA Masaki E<lt>masaki@cpan.orgE<gt>
-
-FUJI Goro E<lt>gfuji@cpan.orgE<gt> from 0.22
-
-=head1 OROGINAL AUTHOR
-
-See L<MooseX::Getopt/AUTHOR> and L<MooseX::Getopt/CONTRIBUTORS>.
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+L<MouseX::Getopt>
 
 =cut

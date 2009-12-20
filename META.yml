@@ -4,8 +4,10 @@ author:
   - 'NAKAGAWA Masaki <masaki@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: 6.42
+  Getopt::Long::Descriptive: 0.077
   Test::Exception: 0.21
   Test::More: 0.62
+  Test::Mouse: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.42
 distribution_type: module
@@ -14,6 +16,7 @@ license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
+module_name: MouseX::Getopt
 name: MouseX-Getopt
 no_index:
   directory:
@@ -21,10 +24,8 @@ no_index:
     - t
 requires:
   Getopt::Long: 2.37
-  Getopt::Long::Descriptive: 0.077
-  Mouse: 0.39
-  perl: 5.8.1
+  Mouse: 0.45
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/gfx/Perl-MouseX-Getopt.git
-version: 0.2201
+version: 0.2600

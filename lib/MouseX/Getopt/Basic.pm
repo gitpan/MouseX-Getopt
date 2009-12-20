@@ -1,3 +1,4 @@
+
 package MouseX::Getopt::Basic;
 use Mouse::Role;
 
@@ -6,24 +7,10 @@ use MouseX::Getopt::Meta::Attribute;
 use MouseX::Getopt::Meta::Attribute::NoGetopt;
 use Carp ();
 
-use Getopt::Long (); # GLD uses it anyway, doesn't hurt
+use Getopt::Long ();
 
 has ARGV       => (is => 'rw', isa => 'ArrayRef', metaclass => "NoGetopt");
 has extra_argv => (is => 'rw', isa => 'ArrayRef', metaclass => "NoGetopt");
-
-# _getopt_spec() and _getoptions() are overrided by MouseX::Getopt::GLD.
-
-sub _getopt_spec {
-    my ($class, %params) = @_;
-    return $class->_traditional_spec(%params) 
-}
-
-sub _get_options {
-    my ($class, undef, $opt_spec) = @_;
-    my %options;
-    Getopt::Long::GetOptions(\%options, @$opt_spec);
-    return ( \%options, undef );
-}
 
 sub new_with_options {
     my ($class, @params) = @_;
@@ -39,20 +26,27 @@ sub new_with_options {
         if(!defined $configfile) {
             my $cfmeta = $class->meta->find_attribute_by_name('configfile');
             $configfile = $cfmeta->default if $cfmeta->has_default;
-        }
-
-        if (defined $configfile) {
-            $config_from_file = eval {
-                $class->get_config_from_file($configfile);
-            };
-            if ($@) {
-                die $@ unless $@ =~ /Specified configfile '\Q$configfile\E' does not exist/;
+            if (ref $configfile eq 'CODE') {
+                # not sure theres a lot you can do with the class and may break some assumptions
+                # warn?
+                $configfile = &$configfile($class);
             }
+            if (defined $configfile) {
+                $config_from_file = eval {
+                    $class->get_config_from_file($configfile);
+                };
+                if ($@) {
+                    die $@ unless $@ =~ /Specified configfile '\Q$configfile\E' does not exist/;
+                }
+            }
+        }
+        else {
+            $config_from_file = $class->get_config_from_file($configfile);
         }
     }
 
     my $constructor_params = ( @params == 1 ? $params[0] : {@params} );
-    
+
     Carp::croak("Single parameters to new_with_options() must be a HASH ref")
         unless ref($constructor_params) eq 'HASH';
 
@@ -68,7 +62,7 @@ sub new_with_options {
     # did the user request usage information?
     if ( $processed{usage} && ($params->{'?'} or $params->{help} or $params->{usage}) )
     {
-        $processed{usage}->die();
+        $class->_getopt_full_usage($processed{usage});
     }
 
     $class->new(
@@ -78,6 +72,8 @@ sub new_with_options {
         %$params, # params from CLI
     );
 }
+
+sub _getopt_spec { shift->_traditional_spec(@_); }
 
 sub _parse_argv {
     my ( $class, %params ) = @_;
@@ -89,15 +85,15 @@ sub _parse_argv {
     # Get a clean copy of the original @ARGV
     my $argv_copy = [ @ARGV ];
 
-    my @err;
-
+    my @warnings;
     my ( $parsed_options, $usage ) = eval {
-        local $SIG{__WARN__} = sub { push @err, @_ };
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
 
-        return $class->_get_options(\%params, $opt_spec);
+        return $class->_getopt_get_options(\%params, $opt_spec);
     };
 
-    die join "", grep { defined } @err, $@ if @err or $@;
+    $class->_getopt_spec_warnings(@warnings) if @warnings;
+    $class->_getopt_spec_exception(\@warnings, $@) if $@;
 
     # Get a copy of the Getopt::Long-mangled @ARGV
     my $argv_mangled = [ @ARGV ];
@@ -114,6 +110,25 @@ sub _parse_argv {
         argv      => $argv_mangled,
         ( defined($usage) ? ( usage => $usage ) : () ),
     );
+}
+
+sub _getopt_get_options {
+    my ($class, $params, $opt_spec) = @_;
+    my %options;
+    Getopt::Long::GetOptions(\%options, @$opt_spec);
+    return ( \%options, undef );
+}
+
+sub _getopt_spec_warnings { }
+
+sub _getopt_spec_exception {
+    my ($self, $warnings, $exception) = @_;
+    die @$warnings, $exception;
+}
+
+sub _getopt_full_usage {
+    my ($self, $usage) = @_;
+    $usage->die;
 }
 
 sub _usage_format {
@@ -198,24 +213,22 @@ sub _attrs_to_options {
             # See 100_gld_default_bug.t for an example
             # - SL
             #( ( $attr->has_default && ( $attr->is_default_a_coderef xor $attr->is_lazy ) ) ? ( default => $attr->default({}) ) : () ),
-            ( $attr->{documentation} ? ( doc => $attr->{documentation} ) : () ),
+            ( $attr->has_documentation ? ( doc => $attr->documentation ) : () ),
         }
     }
 
     return @options;
 }
 
-no Mouse::Role;
+no Mouse::Role; 1;
 
-1;
 __END__
 
 =pod
 
 =head1 NAME
 
-MouseX::Getopt::Basic - role to implement the basic functionality of
-L<MouseX::Getopt> without GLD.
+MouseX::Getopt::Basic - role to implement the Getopt::Long functionality
 
 =head1 SYNOPSIS
 
@@ -248,38 +261,13 @@ doesn't make use of L<Getopt::Long::Descriptive> (or "GLD" for short).
 
 =head1 METHODS
 
-=over 4
+=head2 new_with_options
 
-=item B<new_with_options>
+See L<MouseX::Getopt/new_with_options>.
 
-See L<MouseX::Getopt> .
+=head1 SEE ALSO
 
-=item B<meta>
-
-This returns the role meta object.
-
-=back
-
-=head1 BUGS
-
-All complex software has bugs lurking in it, and this module is no
-exception. If you find a bug please either email me, or add the bug
-to cpan-RT.
-
-=head1 AUTHOR
-
-NAKAGAWA Masaki E<lt>masaki@cpan.orgE<gt>
-
-FUJI Goro E<lt>gfuji@cpan.orgE<gt> from 0.22
-
-=head1 OROGINAL AUTHOR
-
-See L<MooseX::Getopt/AUTHOR> and L<MooseX::Getopt/CONTRIBUTORS>.
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+L<MouseX::Getopt>
 
 =cut
 
