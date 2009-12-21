@@ -28,4 +28,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/gfx/Perl-MouseX-Getopt.git
-version: 0.2600
+version: 0.2601
