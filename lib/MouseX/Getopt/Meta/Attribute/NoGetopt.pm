@@ -1,4 +1,12 @@
 package MouseX::Getopt::Meta::Attribute::NoGetopt;
+BEGIN {
+  $MouseX::Getopt::Meta::Attribute::NoGetopt::AUTHORITY = 'cpan:STEVAN';
+}
+BEGIN {
+  $MouseX::Getopt::Meta::Attribute::NoGetopt::VERSION = '0.31';
+}
+# ABSTRACT: Optional meta attribute for ignoring params
+
 use Mouse;
 
 extends 'Mouse::Meta::Attribute'; # << Mouse extending Mouse :)
@@ -9,13 +17,21 @@ no Mouse;
 # register this as a metaclass alias ...
 package # stop confusing PAUSE
     Mouse::Meta::Attribute::Custom::NoGetopt;
+BEGIN {
+  $Mouse::Meta::Attribute::Custom::NoGetopt::AUTHORITY = 'cpan:STEVAN';
+}
+BEGIN {
+  $Mouse::Meta::Attribute::Custom::NoGetopt::VERSION = '0.31';
+}
 sub register_implementation { 'MouseX::Getopt::Meta::Attribute::NoGetopt' }
 
 1;
 
-__END__
 
+__END__
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -25,11 +41,11 @@ MouseX::Getopt::Meta::Attribute::NoGetopt - Optional meta attribute for ignoring
 
   package App;
   use Mouse;
-  
+
   with 'MouseX::Getopt';
-  
+
   has 'data' => (
-      metaclass => 'NoGetopt',  # do not attempt to capture this param  
+      metaclass => 'NoGetopt',  # do not attempt to capture this param
       is        => 'ro',
       isa       => 'Str',
       default   => 'file.dat',
@@ -37,23 +53,73 @@ MouseX::Getopt::Meta::Attribute::NoGetopt - Optional meta attribute for ignoring
 
 =head1 DESCRIPTION
 
-This is a custom attribute metaclass which can be used to specify 
-that a specific attribute should B<not> be processed by 
-C<MouseX::Getopt>. All you need to do is specify the C<NoGetopt> 
+This is a custom attribute metaclass which can be used to specify
+that a specific attribute should B<not> be processed by
+C<MouseX::Getopt>. All you need to do is specify the C<NoGetopt>
 metaclass.
 
   has 'foo' => (metaclass => 'NoGetopt', ... );
 
-=head1 METHODS
+=head1 AUTHORS
 
 =over 4
 
-=item B<meta>
+=item *
+
+NAKAGAWA Masaki <masaki@cpan.org>
+
+=item *
+
+FUJI Goro <gfuji@cpan.org>
+
+=item *
+
+Stevan Little <stevan@iinteractive.com>
+
+=item *
+
+Brandon L. Black <blblack@gmail.com>
+
+=item *
+
+Yuval Kogman <nothingmuch@woobling.org>
+
+=item *
+
+Ryan D Johnson <ryan@innerfence.com>
+
+=item *
+
+Drew Taylor <drew@drewtaylor.com>
+
+=item *
+
+Tomas Doran <bobtfish@bobtfish.net>
+
+=item *
+
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
+
+=item *
+
+Avar Arnfjord Bjarmason <avar@cpan.org>
+
+=item *
+
+Chris Prather <perigrin@cpan.org>
 
 =back
 
-=head1 SEE ALSO
+=head1 COPYRIGHT AND LICENSE
 
-L<MouseX::Getopt>
+This software is copyright (c) 2010 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
+

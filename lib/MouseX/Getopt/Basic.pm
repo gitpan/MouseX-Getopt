@@ -1,5 +1,12 @@
-
 package MouseX::Getopt::Basic;
+BEGIN {
+  $MouseX::Getopt::Basic::AUTHORITY = 'cpan:STEVAN';
+}
+BEGIN {
+  $MouseX::Getopt::Basic::VERSION = '0.31';
+}
+# ABSTRACT: MouseX::Getopt::Basic - role to implement the Getopt::Long functionality
+
 use Mouse::Role;
 
 use MouseX::Getopt::OptionTypeMap;
@@ -7,7 +14,7 @@ use MouseX::Getopt::Meta::Attribute;
 use MouseX::Getopt::Meta::Attribute::NoGetopt;
 use Carp ();
 
-use Getopt::Long ();
+use Getopt::Long 2.37 ();
 
 has ARGV       => (is => 'rw', isa => 'ArrayRef', metaclass => "NoGetopt");
 has extra_argv => (is => 'rw', isa => 'ArrayRef', metaclass => "NoGetopt");
@@ -19,8 +26,10 @@ sub new_with_options {
     if($class->meta->does_role('MouseX::ConfigFromFile')) {
         local @ARGV = @ARGV;
 
+        # just get the configfile arg now; the rest of the args will be
+        # fetched later
         my $configfile;
-        my $opt_parser = Getopt::Long::Parser->new( config => [ qw( pass_through ) ] );
+        my $opt_parser = Getopt::Long::Parser->new( config => [ qw( no_auto_help pass_through ) ] );
         $opt_parser->getoptions( "configfile=s" => \$configfile );
 
         if(!defined $configfile) {
@@ -60,7 +69,7 @@ sub new_with_options {
     my $params = $config_from_file ? { %$config_from_file, %{$processed{params}} } : $processed{params};
 
     # did the user request usage information?
-    if ( $processed{usage} && ($params->{'?'} or $params->{help} or $params->{usage}) )
+    if ( $processed{usage} and $params->{help_flag} )
     {
         $class->_getopt_full_usage($processed{usage});
     }
@@ -68,6 +77,7 @@ sub new_with_options {
     $class->new(
         ARGV       => $processed{argv_copy},
         extra_argv => $processed{argv},
+        ( $processed{usage} ? ( usage => $processed{usage} ) : () ),
         %$constructor_params, # explicit params to ->new
         %$params, # params from CLI
     );
@@ -154,6 +164,7 @@ sub _traditional_spec {
 
 sub _compute_getopt_attrs {
     my $class = shift;
+    sort { $a->insertion_order <=> $b->insertion_order }
     grep {
         $_->does("MouseX::Getopt::Meta::Attribute::Trait")
             or
@@ -205,9 +216,9 @@ sub _attrs_to_options {
             opt_string => $opt_string,
             required   => $attr->is_required && !$attr->has_default && !$attr->has_builder && !exists $config_from_file->{$attr->name},
             # NOTE:
-            # this "feature" was breaking because 
-            # Getopt::Long::Descriptive would return 
-            # the default value as if it was a command 
+            # this "feature" was breaking because
+            # Getopt::Long::Descriptive would return
+            # the default value as if it was a command
             # line flag, which would then override the
             # one passed into a constructor.
             # See 100_gld_default_bug.t for an example
@@ -220,15 +231,18 @@ sub _attrs_to_options {
     return @options;
 }
 
-no Mouse::Role; 1;
+no Mouse::Role;
+1;
+
 
 __END__
-
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
-MouseX::Getopt::Basic - role to implement the Getopt::Long functionality
+MouseX::Getopt::Basic - MouseX::Getopt::Basic - role to implement the Getopt::Long functionality
 
 =head1 SYNOPSIS
 
@@ -265,9 +279,66 @@ doesn't make use of L<Getopt::Long::Descriptive> (or "GLD" for short).
 
 See L<MouseX::Getopt/new_with_options>.
 
-=head1 SEE ALSO
+=head1 AUTHORS
 
-L<MouseX::Getopt>
+=over 4
+
+=item *
+
+NAKAGAWA Masaki <masaki@cpan.org>
+
+=item *
+
+FUJI Goro <gfuji@cpan.org>
+
+=item *
+
+Stevan Little <stevan@iinteractive.com>
+
+=item *
+
+Brandon L. Black <blblack@gmail.com>
+
+=item *
+
+Yuval Kogman <nothingmuch@woobling.org>
+
+=item *
+
+Ryan D Johnson <ryan@innerfence.com>
+
+=item *
+
+Drew Taylor <drew@drewtaylor.com>
+
+=item *
+
+Tomas Doran <bobtfish@bobtfish.net>
+
+=item *
+
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
+
+=item *
+
+Avar Arnfjord Bjarmason <avar@cpan.org>
+
+=item *
+
+Chris Prather <perigrin@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
 

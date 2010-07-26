@@ -1,17 +1,25 @@
 package MouseX::Getopt;
+BEGIN {
+  $MouseX::Getopt::AUTHORITY = 'cpan:STEVAN';
+}
+BEGIN {
+  $MouseX::Getopt::VERSION = '0.31';
+}
+# ABSTRACT: A Mouse role for processing command line options
+
 use Mouse::Role;
 
-use constant _HAVE_GLD => not not eval { require Getopt::Long::Descriptive };
+with 'MouseX::Getopt::GLD';
 
-our $VERSION   = '0.2601';
+no Mouse::Role;
 
-with _HAVE_GLD ? 'MouseX::Getopt::GLD' : 'MouseX::Getopt::Basic';
+1;
 
-no Mouse::Role; 1;
 
 __END__
-
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -192,9 +200,7 @@ C<=s@>).
 
 =head1 METHODS
 
-=over 4
-
-=item B<new_with_options (%params)>
+=head2 B<new_with_options (%params)>
 
 This method will take a set of default C<%params> and then collect
 params from the command line (possibly overriding those in C<%params>)
@@ -207,8 +213,9 @@ If L<Getopt::Long/GetOptions> fails (due to invalid arguments),
 C<new_with_options> will throw an exception.
 
 If L<Getopt::Long::Descriptive> is installed and any of the following
-command line params are passed, the program will exit with usage 
-information. You can add descriptions for each option by including a
+command line params are passed, the program will exit with usage
+information (and the option's state will be stored in the help_flag
+attribute). You can add descriptions for each option by including a
 B<documentation> option for each attribute to document.
 
   --?
@@ -216,56 +223,93 @@ B<documentation> option for each attribute to document.
   --usage
 
 If you have L<Getopt::Long::Descriptive> the C<usage> param is also passed to
-C<new>.
+C<new> as the usage option.
 
-=item B<ARGV>
+=head2 B<ARGV>
 
 This accessor contains a reference to a copy of the C<@ARGV> array
 as it originally existed at the time of C<new_with_options>.
 
-=item B<extra_argv>
+=head2 B<extra_argv>
 
 This accessor contains an arrayref of leftover C<@ARGV> elements that
 L<Getopt::Long> did not parse.  Note that the real C<@ARGV> is left
 un-mangled.
 
-=item B<meta>
+=head2 B<usage>
+
+This accessor contains the L<Getopt::Long::Descriptive::Usage> object (if
+L<Getopt::Long::Descriptive> is used).
+
+=head2 B<help_flag>
+
+This accessor contains the boolean state of the --help, --usage and --?
+options (true if any of these options were passed on the command line).
+
+=head2 B<meta>
 
 This returns the role meta object.
 
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+NAKAGAWA Masaki <masaki@cpan.org>
+
+=item *
+
+FUJI Goro <gfuji@cpan.org>
+
+=item *
+
+Stevan Little <stevan@iinteractive.com>
+
+=item *
+
+Brandon L. Black <blblack@gmail.com>
+
+=item *
+
+Yuval Kogman <nothingmuch@woobling.org>
+
+=item *
+
+Ryan D Johnson <ryan@innerfence.com>
+
+=item *
+
+Drew Taylor <drew@drewtaylor.com>
+
+=item *
+
+Tomas Doran <bobtfish@bobtfish.net>
+
+=item *
+
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
+
+=item *
+
+Avar Arnfjord Bjarmason <avar@cpan.org>
+
+=item *
+
+Chris Prather <perigrin@cpan.org>
+
 =back
 
-=head1 BUGS
+=head1 COPYRIGHT AND LICENSE
 
-All complex software has bugs lurking in it, and this module is no
-exception. If you find a bug please either email me, or add the bug
-to cpan-RT.
+This software is copyright (c) 2010 by Infinity Interactive, Inc.
 
-=head1 AUTHOR
-
-NAKAGAWA Masaki E<lt>masaki@cpan.orgE<gt>
-
-FUJI Goro E<lt>gfuji@cpan.orgE<gt>
-
-=head1 OROGINAL AUTHORS
-
-This is based on C<MooseX::Getopt>.
-
-See L<MooseX::Getopt/AUTHOR> and L<MooseX::Getopt/CONTRIBUTORS>.
-
-=head1 SEE ALSO
-
-L<Mouse>
-
-L<Moose>
-
-L<MooseX::Getopt>
-
-L<Any::Moose::Convert>
-
-=head1 LICENSE
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
+

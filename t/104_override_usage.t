@@ -10,7 +10,6 @@ use Test::Exception;
     with 'MouseX::Getopt';
 
     has foo => ( isa => 'Int', is => 'ro', documentation => 'A foo' );
-    has help => ( isa => 'Bool', is => 'ro', default => 0, documentation => 'Help');
 
     our $usage = 0;
     before _getopt_full_usage => sub { $usage++; };
@@ -36,9 +35,6 @@ use Test::Exception;
 {
     local $MyScript::usage; local @MyScript::warnings; local @MyScript::exception;
     local @ARGV = ('-q'); # Does not exist
-
-    local $TODO = "This test might fail, but I don't know the reason";
-
     throws_ok { MyScript->new_with_options } qr/A foo/;
     is_deeply \@MyScript::warnings, [
           'Unknown option: q
@@ -47,9 +43,9 @@ use Test::Exception;
     my $exp = [
          'Unknown option: q
 ',
-         qq{usage: 104_override_usage.t [long options...]
-\t--help     Help
-\t--foo      A foo
+         qq{usage: 104_override_usage.t [-?] [long options...]
+\t-? --usage --help  Prints this usage information.
+\t--foo              A foo
 }
      ];
 

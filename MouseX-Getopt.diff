@@ -1,0 +1,2883 @@
+commit fe516759c77302dab87756baa9bd76d5b18b6023
+Author: gfx <gfuji@cpan.org>
+Date:   Mon Jul 26 21:00:57 2010 +0900
+
+    Import from MooseX::Getopt 0.31
+
+diff --git a/.gitignore b/.gitignore
+index 22c2d36..1d986ad 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,4 +1,4 @@
+-MooseX-Getopt-*
++MouseX-Getopt-*
+ pm_to_blib
+ inc
+ blib
+diff --git a/ChangeLog b/ChangeLog
+index ff05b58..38cef83 100644
+--- a/ChangeLog
++++ b/ChangeLog
+@@ -1,4 +1,10 @@
+-Revision history for Perl extension MooseX-Getopt
++Revision history for Perl extension MouseX-Getopt
++
++0.31 Mon Jul 26 20:52:38 2010
++  * Just copied from MooseX-Getopt 0.31
++
++NOTE: This distribution is a copy of MooseX-Getopt, so the following history
++      is that of MooseX-Getopt's, not MouseX-Geopt's.
+ 
+ 0.31 Wed 7 Jul 2010
+   * Fix issue causing tests to fail if MooseX::SimpleConfig isn't installed.
+diff --git a/dist.ini b/dist.ini
+index 22b93d5..3b2eb8e 100644
+--- a/dist.ini
++++ b/dist.ini
+@@ -1,5 +1,7 @@
+-name = MooseX-Getopt
++name = MouseX-Getopt
+ version = 0.31
++author = NAKAGAWA Masaki <masaki@cpan.org>
++author = FUJI Goro <gfuji@cpan.org>
+ author = Stevan Little <stevan@iinteractive.com>
+ author = Brandon L. Black <blblack@gmail.com>
+ author = Yuval Kogman <nothingmuch@woobling.org>
+@@ -7,22 +9,23 @@ author = Ryan D Johnson <ryan@innerfence.com>
+ author = Drew Taylor <drew@drewtaylor.com>
+ author = Tomas Doran <bobtfish@bobtfish.net>
+ author = Florian Ragwitz <rafl@debian.org>
+-author = Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>
+-author = Ævar Arnfjörð Bjarmason <avar@cpan.org>
++author = Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
++author = Avar Arnfjord Bjarmason <avar@cpan.org>
+ author = Chris Prather <perigrin@cpan.org>
+ license = Perl_5
+ copyright_holder = Infinity Interactive, Inc
+ 
+ [@FLORA]
+-dist = MooseX-Getopt
+-repository_at = gitmo
++dist = MouseX-Getopt
++repository_at = github
++github_user = gfx
+ authority = cpan:STEVAN
+ auto_prereq = 0
+ 
+ [Prereq]
+ Getopt::Long = 2.37
+ Getopt::Long::Descriptive = 0.081
+-Moose = 0.56
++Mouse = 0.64
+ 
+ [Prereq / TestRequires]
+ Test::Exception = 0.21
+diff --git a/lib/MooseX/Getopt.pm b/lib/MooseX/Getopt.pm
+deleted file mode 100644
+index fdd4263..0000000
+--- a/lib/MooseX/Getopt.pm
++++ /dev/null
+@@ -1,235 +0,0 @@
+-package MooseX::Getopt;
+-# ABSTRACT: A Moose role for processing command line options
+-
+-use Moose::Role 0.56;
+-
+-with 'MooseX::Getopt::GLD';
+-
+-no Moose::Role;
+-
+-1;
+-
+-=head1 SYNOPSIS
+-
+-  ## In your class
+-  package My::App;
+-  use Moose;
+-
+-  with 'MooseX::Getopt';
+-
+-  has 'out' => (is => 'rw', isa => 'Str', required => 1);
+-  has 'in'  => (is => 'rw', isa => 'Str', required => 1);
+-
+-  # ... rest of the class here
+-
+-  ## in your script
+-  #!/usr/bin/perl
+-
+-  use My::App;
+-
+-  my $app = My::App->new_with_options();
+-  # ... rest of the script here
+-
+-  ## on the command line
+-  % perl my_app_script.pl -in file.input -out file.dump
+-
+-=head1 DESCRIPTION
+-
+-This is a role which provides an alternate constructor for creating
+-objects using parameters passed in from the command line.
+-
+-This module attempts to DWIM as much as possible with the command line
+-params by introspecting your class's attributes. It will use the name
+-of your attribute as the command line option, and if there is a type
+-constraint defined, it will configure Getopt::Long to handle the option
+-accordingly.
+-
+-You can use the trait L<MooseX::Getopt::Meta::Attribute::Trait> or the
+-attribute metaclass L<MooseX::Getopt::Meta::Attribute> to get non-default
+-commandline option names and aliases.
+-
+-You can use the trait L<MooseX::Getopt::Meta::Attribute::Trait::NoGetopt>
+-or the attribute metaclass L<MooseX::Getopt::Meta::Attribute::NoGetopt>
+-to have C<MooseX::Getopt> ignore your attribute in the commandline options.
+-
+-By default, attributes which start with an underscore are not given
+-commandline argument support, unless the attribute's metaclass is set
+-to L<MooseX::Getopt::Meta::Attribute>. If you don't want your accessors
+-to have the leading underscore in their name, you can do this:
+-
+-  # for read/write attributes
+-  has '_foo' => (accessor => 'foo', ...);
+-
+-  # or for read-only attributes
+-  has '_bar' => (reader => 'bar', ...);
+-
+-This will mean that Getopt will not handle a --foo param, but your
+-code can still call the C<foo> method.
+-
+-If your class also uses a configfile-loading role based on
+-L<MooseX::ConfigFromFile>, such as L<MooseX::SimpleConfig>,
+-L<MooseX::Getopt>'s C<new_with_options> will load the configfile
+-specified by the C<--configfile> option (or the default you've
+-given for the configfile attribute) for you.
+-
+-Options specified in multiple places follow the following
+-precendence order: commandline overrides configfile, which
+-overrides explicit new_with_options parameters.
+-
+-=head2 Supported Type Constraints
+-
+-=over 4
+-
+-=item I<Bool>
+-
+-A I<Bool> type constraint is set up as a boolean option with
+-Getopt::Long. So that this attribute description:
+-
+-  has 'verbose' => (is => 'rw', isa => 'Bool');
+-
+-would translate into C<verbose!> as a Getopt::Long option descriptor,
+-which would enable the following command line options:
+-
+-  % my_script.pl --verbose
+-  % my_script.pl --noverbose
+-
+-=item I<Int>, I<Float>, I<Str>
+-
+-These type constraints are set up as properly typed options with
+-Getopt::Long, using the C<=i>, C<=f> and C<=s> modifiers as appropriate.
+-
+-=item I<ArrayRef>
+-
+-An I<ArrayRef> type constraint is set up as a multiple value option
+-in Getopt::Long. So that this attribute description:
+-
+-  has 'include' => (
+-      is      => 'rw',
+-      isa     => 'ArrayRef',
+-      default => sub { [] }
+-  );
+-
+-would translate into C<includes=s@> as a Getopt::Long option descriptor,
+-which would enable the following command line options:
+-
+-  % my_script.pl --include /usr/lib --include /usr/local/lib
+-
+-=item I<HashRef>
+-
+-A I<HashRef> type constraint is set up as a hash value option
+-in Getopt::Long. So that this attribute description:
+-
+-  has 'define' => (
+-      is      => 'rw',
+-      isa     => 'HashRef',
+-      default => sub { {} }
+-  );
+-
+-would translate into C<define=s%> as a Getopt::Long option descriptor,
+-which would enable the following command line options:
+-
+-  % my_script.pl --define os=linux --define vendor=debian
+-
+-=back
+-
+-=head2 Custom Type Constraints
+-
+-It is possible to create custom type constraint to option spec
+-mappings if you need them. The process is fairly simple (but a
+-little verbose maybe). First you create a custom subtype, like
+-so:
+-
+-  subtype 'ArrayOfInts'
+-      => as 'ArrayRef'
+-      => where { scalar (grep { looks_like_number($_) } @$_)  };
+-
+-Then you register the mapping, like so:
+-
+-  MooseX::Getopt::OptionTypeMap->add_option_type_to_map(
+-      'ArrayOfInts' => '=i@'
+-  );
+-
+-Now any attribute declarations using this type constraint will
+-get the custom option spec. So that, this:
+-
+-  has 'nums' => (
+-      is      => 'ro',
+-      isa     => 'ArrayOfInts',
+-      default => sub { [0] }
+-  );
+-
+-Will translate to the following on the command line:
+-
+-  % my_script.pl --nums 5 --nums 88 --nums 199
+-
+-This example is fairly trivial, but more complex validations are
+-easily possible with a little creativity. The trick is balancing
+-the type constraint validations with the Getopt::Long validations.
+-
+-Better examples are certainly welcome :)
+-
+-=head2 Inferred Type Constraints
+-
+-If you define a custom subtype which is a subtype of one of the
+-standard L</Supported Type Constraints> above, and do not explicitly
+-provide custom support as in L</Custom Type Constraints> above,
+-MooseX::Getopt will treat it like the parent type for Getopt
+-purposes.
+-
+-For example, if you had the same custom C<ArrayOfInts> subtype
+-from the examples above, but did not add a new custom option
+-type for it to the C<OptionTypeMap>, it would be treated just
+-like a normal C<ArrayRef> type for Getopt purposes (that is,
+-C<=s@>).
+-
+-=method B<new_with_options (%params)>
+-
+-This method will take a set of default C<%params> and then collect
+-params from the command line (possibly overriding those in C<%params>)
+-and then return a newly constructed object.
+-
+-The special parameter C<argv>, if specified should point to an array
+-reference with an array to use instead of C<@ARGV>.
+-
+-If L<Getopt::Long/GetOptions> fails (due to invalid arguments),
+-C<new_with_options> will throw an exception.
+-
+-If L<Getopt::Long::Descriptive> is installed and any of the following
+-command line params are passed, the program will exit with usage
+-information (and the option's state will be stored in the help_flag
+-attribute). You can add descriptions for each option by including a
+-B<documentation> option for each attribute to document.
+-
+-  --?
+-  --help
+-  --usage
+-
+-If you have L<Getopt::Long::Descriptive> the C<usage> param is also passed to
+-C<new> as the usage option.
+-
+-=method B<ARGV>
+-
+-This accessor contains a reference to a copy of the C<@ARGV> array
+-as it originally existed at the time of C<new_with_options>.
+-
+-=method B<extra_argv>
+-
+-This accessor contains an arrayref of leftover C<@ARGV> elements that
+-L<Getopt::Long> did not parse.  Note that the real C<@ARGV> is left
+-un-mangled.
+-
+-=method B<usage>
+-
+-This accessor contains the L<Getopt::Long::Descriptive::Usage> object (if
+-L<Getopt::Long::Descriptive> is used).
+-
+-=method B<help_flag>
+-
+-This accessor contains the boolean state of the --help, --usage and --?
+-options (true if any of these options were passed on the command line).
+-
+-=method B<meta>
+-
+-This returns the role meta object.
+-
+-=cut
+diff --git a/lib/MooseX/Getopt/Basic.pm b/lib/MooseX/Getopt/Basic.pm
+deleted file mode 100644
+index 44d683c..0000000
+--- a/lib/MooseX/Getopt/Basic.pm
++++ /dev/null
+@@ -1,264 +0,0 @@
+-package MooseX::Getopt::Basic;
+-# ABSTRACT: MooseX::Getopt::Basic - role to implement the Getopt::Long functionality
+-
+-use Moose::Role;
+-
+-use MooseX::Getopt::OptionTypeMap;
+-use MooseX::Getopt::Meta::Attribute;
+-use MooseX::Getopt::Meta::Attribute::NoGetopt;
+-use Carp ();
+-
+-use Getopt::Long 2.37 ();
+-
+-has ARGV       => (is => 'rw', isa => 'ArrayRef', metaclass => "NoGetopt");
+-has extra_argv => (is => 'rw', isa => 'ArrayRef', metaclass => "NoGetopt");
+-
+-sub new_with_options {
+-    my ($class, @params) = @_;
+-
+-    my $config_from_file;
+-    if($class->meta->does_role('MooseX::ConfigFromFile')) {
+-        local @ARGV = @ARGV;
+-
+-        # just get the configfile arg now; the rest of the args will be
+-        # fetched later
+-        my $configfile;
+-        my $opt_parser = Getopt::Long::Parser->new( config => [ qw( no_auto_help pass_through ) ] );
+-        $opt_parser->getoptions( "configfile=s" => \$configfile );
+-
+-        if(!defined $configfile) {
+-            my $cfmeta = $class->meta->find_attribute_by_name('configfile');
+-            $configfile = $cfmeta->default if $cfmeta->has_default;
+-            if (ref $configfile eq 'CODE') {
+-                # not sure theres a lot you can do with the class and may break some assumptions
+-                # warn?
+-                $configfile = &$configfile($class);
+-            }
+-            if (defined $configfile) {
+-                $config_from_file = eval {
+-                    $class->get_config_from_file($configfile);
+-                };
+-                if ($@) {
+-                    die $@ unless $@ =~ /Specified configfile '\Q$configfile\E' does not exist/;
+-                }
+-            }
+-        }
+-        else {
+-            $config_from_file = $class->get_config_from_file($configfile);
+-        }
+-    }
+-
+-    my $constructor_params = ( @params == 1 ? $params[0] : {@params} );
+-
+-    Carp::croak("Single parameters to new_with_options() must be a HASH ref")
+-        unless ref($constructor_params) eq 'HASH';
+-
+-    my %processed = $class->_parse_argv(
+-        options => [
+-            $class->_attrs_to_options( $config_from_file )
+-        ],
+-        params => $constructor_params,
+-    );
+-
+-    my $params = $config_from_file ? { %$config_from_file, %{$processed{params}} } : $processed{params};
+-
+-    # did the user request usage information?
+-    if ( $processed{usage} and $params->{help_flag} )
+-    {
+-        $class->_getopt_full_usage($processed{usage});
+-    }
+-
+-    $class->new(
+-        ARGV       => $processed{argv_copy},
+-        extra_argv => $processed{argv},
+-        ( $processed{usage} ? ( usage => $processed{usage} ) : () ),
+-        %$constructor_params, # explicit params to ->new
+-        %$params, # params from CLI
+-    );
+-}
+-
+-sub _getopt_spec { shift->_traditional_spec(@_); }
+-
+-sub _parse_argv {
+-    my ( $class, %params ) = @_;
+-
+-    local @ARGV = @{ $params{params}{argv} || \@ARGV };
+-
+-    my ( $opt_spec, $name_to_init_arg ) = $class->_getopt_spec(%params);
+-
+-    # Get a clean copy of the original @ARGV
+-    my $argv_copy = [ @ARGV ];
+-
+-    my @warnings;
+-    my ( $parsed_options, $usage ) = eval {
+-        local $SIG{__WARN__} = sub { push @warnings, @_ };
+-
+-        return $class->_getopt_get_options(\%params, $opt_spec);
+-    };
+-
+-    $class->_getopt_spec_warnings(@warnings) if @warnings;
+-    $class->_getopt_spec_exception(\@warnings, $@) if $@;
+-
+-    # Get a copy of the Getopt::Long-mangled @ARGV
+-    my $argv_mangled = [ @ARGV ];
+-
+-    my %constructor_args = (
+-        map {
+-            $name_to_init_arg->{$_} => $parsed_options->{$_}
+-        } keys %$parsed_options,
+-    );
+-
+-    return (
+-        params    => \%constructor_args,
+-        argv_copy => $argv_copy,
+-        argv      => $argv_mangled,
+-        ( defined($usage) ? ( usage => $usage ) : () ),
+-    );
+-}
+-
+-sub _getopt_get_options {
+-    my ($class, $params, $opt_spec) = @_;
+-    my %options;
+-    Getopt::Long::GetOptions(\%options, @$opt_spec);
+-    return ( \%options, undef );
+-}
+-
+-sub _getopt_spec_warnings { }
+-
+-sub _getopt_spec_exception {
+-    my ($self, $warnings, $exception) = @_;
+-    die @$warnings, $exception;
+-}
+-
+-sub _getopt_full_usage {
+-    my ($self, $usage) = @_;
+-    $usage->die;
+-}
+-
+-sub _usage_format {
+-    return "usage: %c %o";
+-}
+-
+-sub _traditional_spec {
+-    my ( $class, %params ) = @_;
+-
+-    my ( @options, %name_to_init_arg, %options );
+-
+-    foreach my $opt ( @{ $params{options} } ) {
+-        push @options, $opt->{opt_string};
+-
+-        my $identifier = $opt->{name};
+-        $identifier =~ s/\W/_/g; # Getopt::Long does this to all option names
+-
+-        $name_to_init_arg{$identifier} = $opt->{init_arg};
+-    }
+-
+-    return ( \@options, \%name_to_init_arg );
+-}
+-
+-sub _compute_getopt_attrs {
+-    my $class = shift;
+-    sort { $a->insertion_order <=> $b->insertion_order }
+-    grep {
+-        $_->does("MooseX::Getopt::Meta::Attribute::Trait")
+-            or
+-        $_->name !~ /^_/
+-    } grep {
+-        !$_->does('MooseX::Getopt::Meta::Attribute::Trait::NoGetopt')
+-    } $class->meta->get_all_attributes
+-}
+-
+-sub _get_cmd_flags_for_attr {
+-    my ( $class, $attr ) = @_;
+-
+-    my $flag = $attr->name;
+-
+-    my @aliases;
+-
+-    if ($attr->does('MooseX::Getopt::Meta::Attribute::Trait')) {
+-        $flag = $attr->cmd_flag if $attr->has_cmd_flag;
+-        @aliases = @{ $attr->cmd_aliases } if $attr->has_cmd_aliases;
+-    }
+-
+-    return ( $flag, @aliases );
+-}
+-
+-sub _attrs_to_options {
+-    my $class = shift;
+-    my $config_from_file = shift || {};
+-
+-    my @options;
+-
+-    foreach my $attr ($class->_compute_getopt_attrs) {
+-        my ( $flag, @aliases ) = $class->_get_cmd_flags_for_attr($attr);
+-
+-        my $opt_string = join(q{|}, $flag, @aliases);
+-
+-        if ($attr->name eq 'configfile') {
+-            $opt_string .= '=s';
+-        }
+-        elsif ($attr->has_type_constraint) {
+-            my $type = $attr->type_constraint;
+-            if (MooseX::Getopt::OptionTypeMap->has_option_type($type)) {
+-                $opt_string .= MooseX::Getopt::OptionTypeMap->get_option_type($type)
+-            }
+-        }
+-
+-        push @options, {
+-            name       => $flag,
+-            init_arg   => $attr->init_arg,
+-            opt_string => $opt_string,
+-            required   => $attr->is_required && !$attr->has_default && !$attr->has_builder && !exists $config_from_file->{$attr->name},
+-            # NOTE:
+-            # this "feature" was breaking because
+-            # Getopt::Long::Descriptive would return
+-            # the default value as if it was a command
+-            # line flag, which would then override the
+-            # one passed into a constructor.
+-            # See 100_gld_default_bug.t for an example
+-            # - SL
+-            #( ( $attr->has_default && ( $attr->is_default_a_coderef xor $attr->is_lazy ) ) ? ( default => $attr->default({}) ) : () ),
+-            ( $attr->has_documentation ? ( doc => $attr->documentation ) : () ),
+-        }
+-    }
+-
+-    return @options;
+-}
+-
+-no Moose::Role;
+-1;
+-
+-=head1 SYNOPSIS
+-
+-  ## In your class
+-  package My::App;
+-  use Moose;
+-
+-  with 'MooseX::Getopt::Basic';
+-
+-  has 'out' => (is => 'rw', isa => 'Str', required => 1);
+-  has 'in'  => (is => 'rw', isa => 'Str', required => 1);
+-
+-  # ... rest of the class here
+-
+-  ## in your script
+-  #!/usr/bin/perl
+-
+-  use My::App;
+-
+-  my $app = My::App->new_with_options();
+-  # ... rest of the script here
+-
+-  ## on the command line
+-  % perl my_app_script.pl --in file.input --out file.dump
+-
+-=head1 DESCRIPTION
+-
+-This is like L<MooseX::Getopt> and can be used instead except that it
+-doesn't make use of L<Getopt::Long::Descriptive> (or "GLD" for short).
+-
+-=method new_with_options
+-
+-See L<MooseX::Getopt/new_with_options>.
+-
+-=cut
+diff --git a/lib/MooseX/Getopt/Dashes.pm b/lib/MooseX/Getopt/Dashes.pm
+deleted file mode 100644
+index ef6a559..0000000
+--- a/lib/MooseX/Getopt/Dashes.pm
++++ /dev/null
+@@ -1,58 +0,0 @@
+-package MooseX::Getopt::Dashes;
+-# ABSTRACT: convert underscores in attribute names to dashes
+-
+-use Moose::Role;
+-
+-with 'MooseX::Getopt';
+-
+-around _get_cmd_flags_for_attr => sub {
+-    my $next = shift;
+-    my ( $class, $attr, @rest ) = @_;
+-
+-    my ( $flag, @aliases ) = $class->$next($attr, @rest);
+-    $flag =~ tr/_/-/
+-        unless $attr->does('MooseX::Getopt::Meta::Attribute::Trait')
+-            && $attr->has_cmd_flag;
+-
+-    return ( $flag, @aliases );
+-};
+-
+-no Moose::Role;
+-
+-1;
+-
+-=head1 SYNOPSIS
+-
+-  package My::App;
+-  use Moose;
+-  with 'MooseX::Getopt::Dashes';
+-
+-  # Will be called as --some-thingy, not --some_thingy
+-  has 'some_thingy' => (
+-      is      => 'ro',
+-      isa     => 'Str',
+-      default => 'foo'
+-  );
+-
+-  # Will be called as --another_thingy, not --another-thingy
+-  has 'another_thingy' => (
+-      traits   => [ 'Getopt' ],
+-      cmd_flag => 'another_thingy'
+-      is       => 'ro',
+-      isa      => 'Str',
+-      default  => 'foo'
+-  );
+-
+-  # use as MooseX::Getopt
+-
+-=head1 DESCRIPTION
+-
+-This is a version of C<MooseX::Getopt> which converts underscores in
+-attribute names to dashes when generating command line flags.
+-
+-You can selectively disable this on a per-attribute basis by supplying
+-a L<cmd_flag|MooseX::Getopt::Meta::Attribute/METHODS> argument with
+-the command flag you'd like for a given attribute. No underscore to
+-dash replacement will be done on the C<cmd_flag>.
+-
+-=cut
+diff --git a/lib/MooseX/Getopt/GLD.pm b/lib/MooseX/Getopt/GLD.pm
+deleted file mode 100644
+index 5edb937..0000000
+--- a/lib/MooseX/Getopt/GLD.pm
++++ /dev/null
+@@ -1,95 +0,0 @@
+-package MooseX::Getopt::GLD;
+-# ABSTRACT: A Moose role for processing command line options with Getopt::Long::Descriptive
+-
+-use Moose::Role;
+-
+-use Getopt::Long::Descriptive 0.081;
+-
+-with 'MooseX::Getopt::Basic';
+-
+-has usage => (
+-    is => 'rw', isa => 'Getopt::Long::Descriptive::Usage',
+-    traits => ['NoGetopt'],
+-);
+-
+-# captures the options: --help --usage --?
+-has help_flag => (
+-    is => 'ro', isa => 'Bool',
+-    traits => ['Getopt'],
+-    cmd_flag => 'help',
+-    cmd_aliases => [ qw(usage ?) ],
+-    documentation => 'Prints this usage information.',
+-);
+-
+-around _getopt_spec => sub {
+-    shift;
+-    shift->_gld_spec(@_);
+-};
+-
+-around _getopt_get_options => sub {
+-    shift;
+-    my ($class, $params, $opt_spec) = @_;
+-    return Getopt::Long::Descriptive::describe_options($class->_usage_format(%$params), @$opt_spec);
+-};
+-
+-sub _gld_spec {
+-    my ( $class, %params ) = @_;
+-
+-    my ( @options, %name_to_init_arg );
+-
+-    my $constructor_params = $params{params};
+-
+-    foreach my $opt ( @{ $params{options} } ) {
+-        push @options, [
+-            $opt->{opt_string},
+-            $opt->{doc} || ' ', # FIXME new GLD shouldn't need this hack
+-            {
+-                ( ( $opt->{required} && !exists($constructor_params->{$opt->{init_arg}}) ) ? (required => $opt->{required}) : () ),
+-                # NOTE:
+-                # remove this 'feature' because it didn't work
+-                # all the time, and so is better to not bother
+-                # since Moose will handle the defaults just
+-                # fine anyway.
+-                # - SL
+-                #( exists $opt->{default}  ? (default  => $opt->{default})  : () ),
+-            },
+-        ];
+-
+-        my $identifier = lc($opt->{name});
+-        $identifier =~ s/\W/_/g; # Getopt::Long does this to all option names
+-
+-        $name_to_init_arg{$identifier} = $opt->{init_arg};
+-    }
+-
+-    return ( \@options, \%name_to_init_arg );
+-}
+-
+-no Moose::Role;
+-
+-1;
+-
+-=head1 SYNOPSIS
+-
+-  ## In your class
+-  package My::App;
+-  use Moose;
+-
+-  with 'MooseX::Getopt::GLD';
+-
+-  has 'out' => (is => 'rw', isa => 'Str', required => 1);
+-  has 'in'  => (is => 'rw', isa => 'Str', required => 1);
+-
+-  # ... rest of the class here
+-
+-  ## in your script
+-  #!/usr/bin/perl
+-
+-  use My::App;
+-
+-  my $app = My::App->new_with_options();
+-  # ... rest of the script here
+-
+-  ## on the command line
+-  % perl my_app_script.pl -in file.input -out file.dump
+-
+-=cut
+diff --git a/lib/MooseX/Getopt/Meta/Attribute.pm b/lib/MooseX/Getopt/Meta/Attribute.pm
+deleted file mode 100644
+index 8bace3b..0000000
+--- a/lib/MooseX/Getopt/Meta/Attribute.pm
++++ /dev/null
+@@ -1,77 +0,0 @@
+-package MooseX::Getopt::Meta::Attribute;
+-# ABSTRACT: Optional meta attribute for custom option names
+-
+-use Moose;
+-use Moose::Util::TypeConstraints;
+-
+-extends 'Moose::Meta::Attribute'; # << Moose extending Moose :)
+-   with 'MooseX::Getopt::Meta::Attribute::Trait';
+-
+-no Moose;
+-
+-# register this as a metaclass alias ...
+-package # stop confusing PAUSE
+-    Moose::Meta::Attribute::Custom::Getopt;
+-sub register_implementation { 'MooseX::Getopt::Meta::Attribute' }
+-
+-1;
+-
+-=head1 SYNOPSIS
+-
+-  package App;
+-  use Moose;
+-
+-  with 'MooseX::Getopt';
+-
+-  has 'data' => (
+-      metaclass => 'MooseX::Getopt::Meta::Attribute',
+-      is        => 'ro',
+-      isa       => 'Str',
+-      default   => 'file.dat',
+-
+-      # tells MooseX::Getopt to use --somedata as the
+-      # command line flag instead of the normal
+-      # autogenerated one (--data)
+-      cmd_flag  => 'somedata',
+-
+-      # tells MooseX::Getopt to also allow --moosedata,
+-      # -m, and -d as aliases for this same option on
+-      # the commandline.
+-      cmd_aliases => [qw/ moosedata m d /],
+-
+-      # Or, you can use a plain scalar for a single alias:
+-      cmd_aliases => 'm',
+-  );
+-
+-=head1 DESCRIPTION
+-
+-This is a custom attribute metaclass which can be used to specify a
+-the specific command line flag to use instead of the default one
+-which L<MooseX::Getopt> will create for you.
+-
+-This is certainly not the prettiest way to go about this, but for
+-now it works for those who might need such a feature.
+-
+-=head2 Custom Metaclass alias
+-
+-This now takes advantage of the Moose 0.19 feature to support
+-custom attribute metaclass aliases. This means you can also
+-use this as the B<Getopt> alias, like so:
+-
+-  has 'foo' => (metaclass => 'Getopt', cmd_flag => 'f');
+-
+-=method B<cmd_flag>
+-
+-Changes the commandline flag to be this value, instead of the default,
+-which is the same as the attribute name.
+-
+-=method B<cmd_aliases>
+-
+-Adds more aliases for this commandline flag, useful for short options
+-and such.
+-
+-=method B<has_cmd_flag>
+-
+-=method B<has_cmd_aliases>
+-
+-=cut
+diff --git a/lib/MooseX/Getopt/Meta/Attribute/NoGetopt.pm b/lib/MooseX/Getopt/Meta/Attribute/NoGetopt.pm
+deleted file mode 100644
+index 934f041..0000000
+--- a/lib/MooseX/Getopt/Meta/Attribute/NoGetopt.pm
++++ /dev/null
+@@ -1,41 +0,0 @@
+-package MooseX::Getopt::Meta::Attribute::NoGetopt;
+-# ABSTRACT: Optional meta attribute for ignoring params
+-
+-use Moose;
+-
+-extends 'Moose::Meta::Attribute'; # << Moose extending Moose :)
+-   with 'MooseX::Getopt::Meta::Attribute::Trait::NoGetopt';
+-
+-no Moose;
+-
+-# register this as a metaclass alias ...
+-package # stop confusing PAUSE
+-    Moose::Meta::Attribute::Custom::NoGetopt;
+-sub register_implementation { 'MooseX::Getopt::Meta::Attribute::NoGetopt' }
+-
+-1;
+-
+-=head1 SYNOPSIS
+-
+-  package App;
+-  use Moose;
+-
+-  with 'MooseX::Getopt';
+-
+-  has 'data' => (
+-      metaclass => 'NoGetopt',  # do not attempt to capture this param
+-      is        => 'ro',
+-      isa       => 'Str',
+-      default   => 'file.dat',
+-  );
+-
+-=head1 DESCRIPTION
+-
+-This is a custom attribute metaclass which can be used to specify
+-that a specific attribute should B<not> be processed by
+-C<MooseX::Getopt>. All you need to do is specify the C<NoGetopt>
+-metaclass.
+-
+-  has 'foo' => (metaclass => 'NoGetopt', ... );
+-
+-=cut
+diff --git a/lib/MooseX/Getopt/Meta/Attribute/Trait.pm b/lib/MooseX/Getopt/Meta/Attribute/Trait.pm
+deleted file mode 100644
+index 9f97881..0000000
+--- a/lib/MooseX/Getopt/Meta/Attribute/Trait.pm
++++ /dev/null
+@@ -1,85 +0,0 @@
+-package MooseX::Getopt::Meta::Attribute::Trait;
+-# ABSTRACT: Optional meta attribute trait for custom option names
+-
+-use Moose::Role;
+-use Moose::Util::TypeConstraints;
+-
+-has 'cmd_flag' => (
+-    is        => 'rw',
+-    isa       => 'Str',
+-    predicate => 'has_cmd_flag',
+-);
+-
+-# This subtype is to support scalar -> arrayref coercion
+-#  without polluting the built-in types
+-subtype '_MooseX_Getopt_CmdAliases' => as 'ArrayRef';
+-
+-coerce '_MooseX_Getopt_CmdAliases'
+-    => from 'Str'
+-        => via { [$_] };
+-
+-has 'cmd_aliases' => (
+-    is        => 'rw',
+-    isa       => '_MooseX_Getopt_CmdAliases',
+-    predicate => 'has_cmd_aliases',
+-    coerce    => 1,
+-);
+-
+-no Moose::Util::TypeConstraints;
+-no Moose::Role;
+-
+-# register this as a metaclass alias ...
+-package # stop confusing PAUSE
+-    Moose::Meta::Attribute::Custom::Trait::Getopt;
+-sub register_implementation { 'MooseX::Getopt::Meta::Attribute::Trait' }
+-
+-1;
+-
+-=head1 SYNOPSIS
+-
+-  package App;
+-  use Moose;
+-
+-  with 'MooseX::Getopt';
+-
+-  has 'data' => (
+-      traits    => [ 'Getopt' ],
+-      is        => 'ro',
+-      isa       => 'Str',
+-      default   => 'file.dat',
+-
+-      # tells MooseX::Getopt to use --somedata as the
+-      # command line flag instead of the normal
+-      # autogenerated one (--data)
+-      cmd_flag  => 'somedata',
+-
+-      # tells MooseX::Getopt to also allow --moosedata,
+-      # -m, and -d as aliases for this same option on
+-      # the commandline.
+-      cmd_aliases => [qw/ moosedata m d /],
+-
+-      # Or, you can use a plain scalar for a single alias:
+-      cmd_aliases => 'm',
+-  );
+-
+-=head1 DESCRIPTION
+-
+-This is a custom attribute metaclass trait which can be used to
+-specify a the specific command line flag to use instead of the
+-default one which L<MooseX::Getopt> will create for you.
+-
+-=method B<cmd_flag>
+-
+-Changes the commandline flag to be this value, instead of the default,
+-which is the same as the attribute name.
+-
+-=method B<cmd_aliases>
+-
+-Adds more aliases for this commandline flag, useful for short options
+-and such.
+-
+-=method B<has_cmd_flag>
+-
+-=method B<has_cmd_aliases>
+-
+-=cut
+diff --git a/lib/MooseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm b/lib/MooseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm
+deleted file mode 100644
+index f3d0846..0000000
+--- a/lib/MooseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm
++++ /dev/null
+@@ -1,37 +0,0 @@
+-package MooseX::Getopt::Meta::Attribute::Trait::NoGetopt;
+-# ABSTRACT: Optional meta attribute trait for ignoring params
+-
+-use Moose::Role;
+-no Moose::Role;
+-
+-# register this as a metaclass alias ...
+-package # stop confusing PAUSE
+-    Moose::Meta::Attribute::Custom::Trait::NoGetopt;
+-sub register_implementation { 'MooseX::Getopt::Meta::Attribute::Trait::NoGetopt' }
+-
+-1;
+-
+-=head1 SYNOPSIS
+-
+-  package App;
+-  use Moose;
+-
+-  with 'MooseX::Getopt';
+-
+-  has 'data' => (
+-      traits  => [ 'NoGetopt' ],  # do not attempt to capture this param
+-      is      => 'ro',
+-      isa     => 'Str',
+-      default => 'file.dat',
+-  );
+-
+-=head1 DESCRIPTION
+-
+-This is a custom attribute metaclass trait which can be used to
+-specify that a specific attribute should B<not> be processed by
+-C<MooseX::Getopt>. All you need to do is specify the C<NoGetopt>
+-metaclass trait.
+-
+-  has 'foo' => (traits => [ 'NoGetopt', ... ], ... );
+-
+-=cut
+diff --git a/lib/MooseX/Getopt/OptionTypeMap.pm b/lib/MooseX/Getopt/OptionTypeMap.pm
+deleted file mode 100644
+index 15c479f..0000000
+--- a/lib/MooseX/Getopt/OptionTypeMap.pm
++++ /dev/null
+@@ -1,85 +0,0 @@
+-package MooseX::Getopt::OptionTypeMap;
+-# ABSTRACT: Storage for the option to type mappings
+-
+-use Moose 'confess', 'blessed';
+-use Moose::Util::TypeConstraints 'find_type_constraint';
+-
+-my %option_type_map = (
+-    'Bool'     => '!',
+-    'Str'      => '=s',
+-    'Int'      => '=i',
+-    'Num'      => '=f',
+-    'ArrayRef' => '=s@',
+-    'HashRef'  => '=s%',
+-);
+-
+-sub has_option_type {
+-    my (undef, $type_or_name) = @_;
+-
+-    return 1 if exists $option_type_map{blessed($type_or_name) ? $type_or_name->name : $type_or_name};
+-
+-    my $current = blessed($type_or_name) ? $type_or_name : find_type_constraint($type_or_name);
+-
+-    (defined $current)
+-        || confess "Could not find the type constraint for '$type_or_name'";
+-
+-    while (my $parent = $current->parent) {
+-        return 1 if exists $option_type_map{$parent->name};
+-        $current = $parent;
+-    }
+-
+-    return 0;
+-}
+-
+-sub get_option_type {
+-    my (undef, $type_or_name) = @_;
+-
+-    my $name = blessed($type_or_name) ? $type_or_name->name : $type_or_name;
+-
+-    return $option_type_map{$name} if exists $option_type_map{$name};
+-
+-    my $current = ref $type_or_name ? $type_or_name : find_type_constraint($type_or_name);
+-
+-    (defined $current)
+-        || confess "Could not find the type constraint for '$type_or_name'";
+-
+-    while ( $current = $current->parent ) {
+-        return $option_type_map{$current->name}
+-            if exists $option_type_map{$current->name};
+-    }
+-
+-    return;
+-}
+-
+-sub add_option_type_to_map {
+-    my (undef, $type_name, $option_string) = @_;
+-    (defined $type_name && defined $option_string)
+-        || confess "You must supply both a type name and an option string";
+-
+-    if ( blessed($type_name) ) {
+-        $type_name = $type_name->name;
+-    } else {
+-        (find_type_constraint($type_name))
+-            || confess "The type constraint '$type_name' does not exist";
+-    }
+-
+-    $option_type_map{$type_name} = $option_string;
+-}
+-
+-no Moose::Util::TypeConstraints;
+-no Moose;
+-
+-1;
+-
+-=head1 DESCRIPTION
+-
+-See the I<Custom Type Constraints> section in the L<MooseX::Getopt> docs
+-for more info about how to use this module.
+-
+-=method B<has_option_type ($type_or_name)>
+-
+-=method B<get_option_type ($type_or_name)>
+-
+-=method B<add_option_type_to_map ($type_name, $option_spec)>
+-
+-=cut
+diff --git a/lib/MooseX/Getopt/Strict.pm b/lib/MooseX/Getopt/Strict.pm
+deleted file mode 100644
+index 8241b14..0000000
+--- a/lib/MooseX/Getopt/Strict.pm
++++ /dev/null
+@@ -1,26 +0,0 @@
+-package MooseX::Getopt::Strict;
+-# ABSTRACT: only make options for attrs with the Getopt metaclass
+-
+-use Moose::Role;
+-
+-with 'MooseX::Getopt';
+-
+-around '_compute_getopt_attrs' => sub {
+-    my $next = shift;
+-    my ( $class, @args ) = @_;
+-    grep {
+-        $_->does("MooseX::Getopt::Meta::Attribute::Trait")
+-    } $class->$next(@args);
+-};
+-
+-no Moose::Role;
+-
+-1;
+-
+-=head1 DESCRIPTION
+-
+-This is an stricter version of C<MooseX::Getopt> which only processes the
+-attributes if they explicitly set as C<Getopt> attributes. All other attributes
+-are ignored by the command line handler.
+-
+-=cut
+diff --git a/lib/MouseX/Getopt.pm b/lib/MouseX/Getopt.pm
+new file mode 100644
+index 0000000..fcb324b
+--- /dev/null
++++ b/lib/MouseX/Getopt.pm
+@@ -0,0 +1,235 @@
++package MouseX::Getopt;
++# ABSTRACT: A Mouse role for processing command line options
++
++use Mouse::Role;
++
++with 'MouseX::Getopt::GLD';
++
++no Mouse::Role;
++
++1;
++
++=head1 SYNOPSIS
++
++  ## In your class
++  package My::App;
++  use Mouse;
++
++  with 'MouseX::Getopt';
++
++  has 'out' => (is => 'rw', isa => 'Str', required => 1);
++  has 'in'  => (is => 'rw', isa => 'Str', required => 1);
++
++  # ... rest of the class here
++
++  ## in your script
++  #!/usr/bin/perl
++
++  use My::App;
++
++  my $app = My::App->new_with_options();
++  # ... rest of the script here
++
++  ## on the command line
++  % perl my_app_script.pl -in file.input -out file.dump
++
++=head1 DESCRIPTION
++
++This is a role which provides an alternate constructor for creating
++objects using parameters passed in from the command line.
++
++This module attempts to DWIM as much as possible with the command line
++params by introspecting your class's attributes. It will use the name
++of your attribute as the command line option, and if there is a type
++constraint defined, it will configure Getopt::Long to handle the option
++accordingly.
++
++You can use the trait L<MouseX::Getopt::Meta::Attribute::Trait> or the
++attribute metaclass L<MouseX::Getopt::Meta::Attribute> to get non-default
++commandline option names and aliases.
++
++You can use the trait L<MouseX::Getopt::Meta::Attribute::Trait::NoGetopt>
++or the attribute metaclass L<MouseX::Getopt::Meta::Attribute::NoGetopt>
++to have C<MouseX::Getopt> ignore your attribute in the commandline options.
++
++By default, attributes which start with an underscore are not given
++commandline argument support, unless the attribute's metaclass is set
++to L<MouseX::Getopt::Meta::Attribute>. If you don't want your accessors
++to have the leading underscore in their name, you can do this:
++
++  # for read/write attributes
++  has '_foo' => (accessor => 'foo', ...);
++
++  # or for read-only attributes
++  has '_bar' => (reader => 'bar', ...);
++
++This will mean that Getopt will not handle a --foo param, but your
++code can still call the C<foo> method.
++
++If your class also uses a configfile-loading role based on
++L<MouseX::ConfigFromFile>, such as L<MouseX::SimpleConfig>,
++L<MouseX::Getopt>'s C<new_with_options> will load the configfile
++specified by the C<--configfile> option (or the default you've
++given for the configfile attribute) for you.
++
++Options specified in multiple places follow the following
++precendence order: commandline overrides configfile, which
++overrides explicit new_with_options parameters.
++
++=head2 Supported Type Constraints
++
++=over 4
++
++=item I<Bool>
++
++A I<Bool> type constraint is set up as a boolean option with
++Getopt::Long. So that this attribute description:
++
++  has 'verbose' => (is => 'rw', isa => 'Bool');
++
++would translate into C<verbose!> as a Getopt::Long option descriptor,
++which would enable the following command line options:
++
++  % my_script.pl --verbose
++  % my_script.pl --noverbose
++
++=item I<Int>, I<Float>, I<Str>
++
++These type constraints are set up as properly typed options with
++Getopt::Long, using the C<=i>, C<=f> and C<=s> modifiers as appropriate.
++
++=item I<ArrayRef>
++
++An I<ArrayRef> type constraint is set up as a multiple value option
++in Getopt::Long. So that this attribute description:
++
++  has 'include' => (
++      is      => 'rw',
++      isa     => 'ArrayRef',
++      default => sub { [] }
++  );
++
++would translate into C<includes=s@> as a Getopt::Long option descriptor,
++which would enable the following command line options:
++
++  % my_script.pl --include /usr/lib --include /usr/local/lib
++
++=item I<HashRef>
++
++A I<HashRef> type constraint is set up as a hash value option
++in Getopt::Long. So that this attribute description:
++
++  has 'define' => (
++      is      => 'rw',
++      isa     => 'HashRef',
++      default => sub { {} }
++  );
++
++would translate into C<define=s%> as a Getopt::Long option descriptor,
++which would enable the following command line options:
++
++  % my_script.pl --define os=linux --define vendor=debian
++
++=back
++
++=head2 Custom Type Constraints
++
++It is possible to create custom type constraint to option spec
++mappings if you need them. The process is fairly simple (but a
++little verbose maybe). First you create a custom subtype, like
++so:
++
++  subtype 'ArrayOfInts'
++      => as 'ArrayRef'
++      => where { scalar (grep { looks_like_number($_) } @$_)  };
++
++Then you register the mapping, like so:
++
++  MouseX::Getopt::OptionTypeMap->add_option_type_to_map(
++      'ArrayOfInts' => '=i@'
++  );
++
++Now any attribute declarations using this type constraint will
++get the custom option spec. So that, this:
++
++  has 'nums' => (
++      is      => 'ro',
++      isa     => 'ArrayOfInts',
++      default => sub { [0] }
++  );
++
++Will translate to the following on the command line:
++
++  % my_script.pl --nums 5 --nums 88 --nums 199
++
++This example is fairly trivial, but more complex validations are
++easily possible with a little creativity. The trick is balancing
++the type constraint validations with the Getopt::Long validations.
++
++Better examples are certainly welcome :)
++
++=head2 Inferred Type Constraints
++
++If you define a custom subtype which is a subtype of one of the
++standard L</Supported Type Constraints> above, and do not explicitly
++provide custom support as in L</Custom Type Constraints> above,
++MouseX::Getopt will treat it like the parent type for Getopt
++purposes.
++
++For example, if you had the same custom C<ArrayOfInts> subtype
++from the examples above, but did not add a new custom option
++type for it to the C<OptionTypeMap>, it would be treated just
++like a normal C<ArrayRef> type for Getopt purposes (that is,
++C<=s@>).
++
++=method B<new_with_options (%params)>
++
++This method will take a set of default C<%params> and then collect
++params from the command line (possibly overriding those in C<%params>)
++and then return a newly constructed object.
++
++The special parameter C<argv>, if specified should point to an array
++reference with an array to use instead of C<@ARGV>.
++
++If L<Getopt::Long/GetOptions> fails (due to invalid arguments),
++C<new_with_options> will throw an exception.
++
++If L<Getopt::Long::Descriptive> is installed and any of the following
++command line params are passed, the program will exit with usage
++information (and the option's state will be stored in the help_flag
++attribute). You can add descriptions for each option by including a
++B<documentation> option for each attribute to document.
++
++  --?
++  --help
++  --usage
++
++If you have L<Getopt::Long::Descriptive> the C<usage> param is also passed to
++C<new> as the usage option.
++
++=method B<ARGV>
++
++This accessor contains a reference to a copy of the C<@ARGV> array
++as it originally existed at the time of C<new_with_options>.
++
++=method B<extra_argv>
++
++This accessor contains an arrayref of leftover C<@ARGV> elements that
++L<Getopt::Long> did not parse.  Note that the real C<@ARGV> is left
++un-mangled.
++
++=method B<usage>
++
++This accessor contains the L<Getopt::Long::Descriptive::Usage> object (if
++L<Getopt::Long::Descriptive> is used).
++
++=method B<help_flag>
++
++This accessor contains the boolean state of the --help, --usage and --?
++options (true if any of these options were passed on the command line).
++
++=method B<meta>
++
++This returns the role meta object.
++
++=cut
+diff --git a/lib/MouseX/Getopt/Basic.pm b/lib/MouseX/Getopt/Basic.pm
+new file mode 100644
+index 0000000..e9e6e68
+--- /dev/null
++++ b/lib/MouseX/Getopt/Basic.pm
+@@ -0,0 +1,264 @@
++package MouseX::Getopt::Basic;
++# ABSTRACT: MouseX::Getopt::Basic - role to implement the Getopt::Long functionality
++
++use Mouse::Role;
++
++use MouseX::Getopt::OptionTypeMap;
++use MouseX::Getopt::Meta::Attribute;
++use MouseX::Getopt::Meta::Attribute::NoGetopt;
++use Carp ();
++
++use Getopt::Long 2.37 ();
++
++has ARGV       => (is => 'rw', isa => 'ArrayRef', metaclass => "NoGetopt");
++has extra_argv => (is => 'rw', isa => 'ArrayRef', metaclass => "NoGetopt");
++
++sub new_with_options {
++    my ($class, @params) = @_;
++
++    my $config_from_file;
++    if($class->meta->does_role('MouseX::ConfigFromFile')) {
++        local @ARGV = @ARGV;
++
++        # just get the configfile arg now; the rest of the args will be
++        # fetched later
++        my $configfile;
++        my $opt_parser = Getopt::Long::Parser->new( config => [ qw( no_auto_help pass_through ) ] );
++        $opt_parser->getoptions( "configfile=s" => \$configfile );
++
++        if(!defined $configfile) {
++            my $cfmeta = $class->meta->find_attribute_by_name('configfile');
++            $configfile = $cfmeta->default if $cfmeta->has_default;
++            if (ref $configfile eq 'CODE') {
++                # not sure theres a lot you can do with the class and may break some assumptions
++                # warn?
++                $configfile = &$configfile($class);
++            }
++            if (defined $configfile) {
++                $config_from_file = eval {
++                    $class->get_config_from_file($configfile);
++                };
++                if ($@) {
++                    die $@ unless $@ =~ /Specified configfile '\Q$configfile\E' does not exist/;
++                }
++            }
++        }
++        else {
++            $config_from_file = $class->get_config_from_file($configfile);
++        }
++    }
++
++    my $constructor_params = ( @params == 1 ? $params[0] : {@params} );
++
++    Carp::croak("Single parameters to new_with_options() must be a HASH ref")
++        unless ref($constructor_params) eq 'HASH';
++
++    my %processed = $class->_parse_argv(
++        options => [
++            $class->_attrs_to_options( $config_from_file )
++        ],
++        params => $constructor_params,
++    );
++
++    my $params = $config_from_file ? { %$config_from_file, %{$processed{params}} } : $processed{params};
++
++    # did the user request usage information?
++    if ( $processed{usage} and $params->{help_flag} )
++    {
++        $class->_getopt_full_usage($processed{usage});
++    }
++
++    $class->new(
++        ARGV       => $processed{argv_copy},
++        extra_argv => $processed{argv},
++        ( $processed{usage} ? ( usage => $processed{usage} ) : () ),
++        %$constructor_params, # explicit params to ->new
++        %$params, # params from CLI
++    );
++}
++
++sub _getopt_spec { shift->_traditional_spec(@_); }
++
++sub _parse_argv {
++    my ( $class, %params ) = @_;
++
++    local @ARGV = @{ $params{params}{argv} || \@ARGV };
++
++    my ( $opt_spec, $name_to_init_arg ) = $class->_getopt_spec(%params);
++
++    # Get a clean copy of the original @ARGV
++    my $argv_copy = [ @ARGV ];
++
++    my @warnings;
++    my ( $parsed_options, $usage ) = eval {
++        local $SIG{__WARN__} = sub { push @warnings, @_ };
++
++        return $class->_getopt_get_options(\%params, $opt_spec);
++    };
++
++    $class->_getopt_spec_warnings(@warnings) if @warnings;
++    $class->_getopt_spec_exception(\@warnings, $@) if $@;
++
++    # Get a copy of the Getopt::Long-mangled @ARGV
++    my $argv_mangled = [ @ARGV ];
++
++    my %constructor_args = (
++        map {
++            $name_to_init_arg->{$_} => $parsed_options->{$_}
++        } keys %$parsed_options,
++    );
++
++    return (
++        params    => \%constructor_args,
++        argv_copy => $argv_copy,
++        argv      => $argv_mangled,
++        ( defined($usage) ? ( usage => $usage ) : () ),
++    );
++}
++
++sub _getopt_get_options {
++    my ($class, $params, $opt_spec) = @_;
++    my %options;
++    Getopt::Long::GetOptions(\%options, @$opt_spec);
++    return ( \%options, undef );
++}
++
++sub _getopt_spec_warnings { }
++
++sub _getopt_spec_exception {
++    my ($self, $warnings, $exception) = @_;
++    die @$warnings, $exception;
++}
++
++sub _getopt_full_usage {
++    my ($self, $usage) = @_;
++    $usage->die;
++}
++
++sub _usage_format {
++    return "usage: %c %o";
++}
++
++sub _traditional_spec {
++    my ( $class, %params ) = @_;
++
++    my ( @options, %name_to_init_arg, %options );
++
++    foreach my $opt ( @{ $params{options} } ) {
++        push @options, $opt->{opt_string};
++
++        my $identifier = $opt->{name};
++        $identifier =~ s/\W/_/g; # Getopt::Long does this to all option names
++
++        $name_to_init_arg{$identifier} = $opt->{init_arg};
++    }
++
++    return ( \@options, \%name_to_init_arg );
++}
++
++sub _compute_getopt_attrs {
++    my $class = shift;
++    sort { $a->insertion_order <=> $b->insertion_order }
++    grep {
++        $_->does("MouseX::Getopt::Meta::Attribute::Trait")
++            or
++        $_->name !~ /^_/
++    } grep {
++        !$_->does('MouseX::Getopt::Meta::Attribute::Trait::NoGetopt')
++    } $class->meta->get_all_attributes
++}
++
++sub _get_cmd_flags_for_attr {
++    my ( $class, $attr ) = @_;
++
++    my $flag = $attr->name;
++
++    my @aliases;
++
++    if ($attr->does('MouseX::Getopt::Meta::Attribute::Trait')) {
++        $flag = $attr->cmd_flag if $attr->has_cmd_flag;
++        @aliases = @{ $attr->cmd_aliases } if $attr->has_cmd_aliases;
++    }
++
++    return ( $flag, @aliases );
++}
++
++sub _attrs_to_options {
++    my $class = shift;
++    my $config_from_file = shift || {};
++
++    my @options;
++
++    foreach my $attr ($class->_compute_getopt_attrs) {
++        my ( $flag, @aliases ) = $class->_get_cmd_flags_for_attr($attr);
++
++        my $opt_string = join(q{|}, $flag, @aliases);
++
++        if ($attr->name eq 'configfile') {
++            $opt_string .= '=s';
++        }
++        elsif ($attr->has_type_constraint) {
++            my $type = $attr->type_constraint;
++            if (MouseX::Getopt::OptionTypeMap->has_option_type($type)) {
++                $opt_string .= MouseX::Getopt::OptionTypeMap->get_option_type($type)
++            }
++        }
++
++        push @options, {
++            name       => $flag,
++            init_arg   => $attr->init_arg,
++            opt_string => $opt_string,
++            required   => $attr->is_required && !$attr->has_default && !$attr->has_builder && !exists $config_from_file->{$attr->name},
++            # NOTE:
++            # this "feature" was breaking because
++            # Getopt::Long::Descriptive would return
++            # the default value as if it was a command
++            # line flag, which would then override the
++            # one passed into a constructor.
++            # See 100_gld_default_bug.t for an example
++            # - SL
++            #( ( $attr->has_default && ( $attr->is_default_a_coderef xor $attr->is_lazy ) ) ? ( default => $attr->default({}) ) : () ),
++            ( $attr->has_documentation ? ( doc => $attr->documentation ) : () ),
++        }
++    }
++
++    return @options;
++}
++
++no Mouse::Role;
++1;
++
++=head1 SYNOPSIS
++
++  ## In your class
++  package My::App;
++  use Mouse;
++
++  with 'MouseX::Getopt::Basic';
++
++  has 'out' => (is => 'rw', isa => 'Str', required => 1);
++  has 'in'  => (is => 'rw', isa => 'Str', required => 1);
++
++  # ... rest of the class here
++
++  ## in your script
++  #!/usr/bin/perl
++
++  use My::App;
++
++  my $app = My::App->new_with_options();
++  # ... rest of the script here
++
++  ## on the command line
++  % perl my_app_script.pl --in file.input --out file.dump
++
++=head1 DESCRIPTION
++
++This is like L<MouseX::Getopt> and can be used instead except that it
++doesn't make use of L<Getopt::Long::Descriptive> (or "GLD" for short).
++
++=method new_with_options
++
++See L<MouseX::Getopt/new_with_options>.
++
++=cut
+diff --git a/lib/MouseX/Getopt/Dashes.pm b/lib/MouseX/Getopt/Dashes.pm
+new file mode 100644
+index 0000000..2170444
+--- /dev/null
++++ b/lib/MouseX/Getopt/Dashes.pm
+@@ -0,0 +1,58 @@
++package MouseX::Getopt::Dashes;
++# ABSTRACT: convert underscores in attribute names to dashes
++
++use Mouse::Role;
++
++with 'MouseX::Getopt';
++
++around _get_cmd_flags_for_attr => sub {
++    my $next = shift;
++    my ( $class, $attr, @rest ) = @_;
++
++    my ( $flag, @aliases ) = $class->$next($attr, @rest);
++    $flag =~ tr/_/-/
++        unless $attr->does('MouseX::Getopt::Meta::Attribute::Trait')
++            && $attr->has_cmd_flag;
++
++    return ( $flag, @aliases );
++};
++
++no Mouse::Role;
++
++1;
++
++=head1 SYNOPSIS
++
++  package My::App;
++  use Mouse;
++  with 'MouseX::Getopt::Dashes';
++
++  # Will be called as --some-thingy, not --some_thingy
++  has 'some_thingy' => (
++      is      => 'ro',
++      isa     => 'Str',
++      default => 'foo'
++  );
++
++  # Will be called as --another_thingy, not --another-thingy
++  has 'another_thingy' => (
++      traits   => [ 'Getopt' ],
++      cmd_flag => 'another_thingy'
++      is       => 'ro',
++      isa      => 'Str',
++      default  => 'foo'
++  );
++
++  # use as MouseX::Getopt
++
++=head1 DESCRIPTION
++
++This is a version of C<MouseX::Getopt> which converts underscores in
++attribute names to dashes when generating command line flags.
++
++You can selectively disable this on a per-attribute basis by supplying
++a L<cmd_flag|MouseX::Getopt::Meta::Attribute/METHODS> argument with
++the command flag you'd like for a given attribute. No underscore to
++dash replacement will be done on the C<cmd_flag>.
++
++=cut
+diff --git a/lib/MouseX/Getopt/GLD.pm b/lib/MouseX/Getopt/GLD.pm
+new file mode 100644
+index 0000000..ad19546
+--- /dev/null
++++ b/lib/MouseX/Getopt/GLD.pm
+@@ -0,0 +1,95 @@
++package MouseX::Getopt::GLD;
++# ABSTRACT: A Mouse role for processing command line options with Getopt::Long::Descriptive
++
++use Mouse::Role;
++
++use Getopt::Long::Descriptive 0.081;
++
++with 'MouseX::Getopt::Basic';
++
++has usage => (
++    is => 'rw', isa => 'Getopt::Long::Descriptive::Usage',
++    traits => ['NoGetopt'],
++);
++
++# captures the options: --help --usage --?
++has help_flag => (
++    is => 'ro', isa => 'Bool',
++    traits => ['Getopt'],
++    cmd_flag => 'help',
++    cmd_aliases => [ qw(usage ?) ],
++    documentation => 'Prints this usage information.',
++);
++
++around _getopt_spec => sub {
++    shift;
++    shift->_gld_spec(@_);
++};
++
++around _getopt_get_options => sub {
++    shift;
++    my ($class, $params, $opt_spec) = @_;
++    return Getopt::Long::Descriptive::describe_options($class->_usage_format(%$params), @$opt_spec);
++};
++
++sub _gld_spec {
++    my ( $class, %params ) = @_;
++
++    my ( @options, %name_to_init_arg );
++
++    my $constructor_params = $params{params};
++
++    foreach my $opt ( @{ $params{options} } ) {
++        push @options, [
++            $opt->{opt_string},
++            $opt->{doc} || ' ', # FIXME new GLD shouldn't need this hack
++            {
++                ( ( $opt->{required} && !exists($constructor_params->{$opt->{init_arg}}) ) ? (required => $opt->{required}) : () ),
++                # NOTE:
++                # remove this 'feature' because it didn't work
++                # all the time, and so is better to not bother
++                # since Mouse will handle the defaults just
++                # fine anyway.
++                # - SL
++                #( exists $opt->{default}  ? (default  => $opt->{default})  : () ),
++            },
++        ];
++
++        my $identifier = lc($opt->{name});
++        $identifier =~ s/\W/_/g; # Getopt::Long does this to all option names
++
++        $name_to_init_arg{$identifier} = $opt->{init_arg};
++    }
++
++    return ( \@options, \%name_to_init_arg );
++}
++
++no Mouse::Role;
++
++1;
++
++=head1 SYNOPSIS
++
++  ## In your class
++  package My::App;
++  use Mouse;
++
++  with 'MouseX::Getopt::GLD';
++
++  has 'out' => (is => 'rw', isa => 'Str', required => 1);
++  has 'in'  => (is => 'rw', isa => 'Str', required => 1);
++
++  # ... rest of the class here
++
++  ## in your script
++  #!/usr/bin/perl
++
++  use My::App;
++
++  my $app = My::App->new_with_options();
++  # ... rest of the script here
++
++  ## on the command line
++  % perl my_app_script.pl -in file.input -out file.dump
++
++=cut
+diff --git a/lib/MouseX/Getopt/Meta/Attribute.pm b/lib/MouseX/Getopt/Meta/Attribute.pm
+new file mode 100644
+index 0000000..40a7b4c
+--- /dev/null
++++ b/lib/MouseX/Getopt/Meta/Attribute.pm
+@@ -0,0 +1,77 @@
++package MouseX::Getopt::Meta::Attribute;
++# ABSTRACT: Optional meta attribute for custom option names
++
++use Mouse;
++use Mouse::Util::TypeConstraints;
++
++extends 'Mouse::Meta::Attribute'; # << Mouse extending Mouse :)
++   with 'MouseX::Getopt::Meta::Attribute::Trait';
++
++no Mouse;
++
++# register this as a metaclass alias ...
++package # stop confusing PAUSE
++    Mouse::Meta::Attribute::Custom::Getopt;
++sub register_implementation { 'MouseX::Getopt::Meta::Attribute' }
++
++1;
++
++=head1 SYNOPSIS
++
++  package App;
++  use Mouse;
++
++  with 'MouseX::Getopt';
++
++  has 'data' => (
++      metaclass => 'MouseX::Getopt::Meta::Attribute',
++      is        => 'ro',
++      isa       => 'Str',
++      default   => 'file.dat',
++
++      # tells MouseX::Getopt to use --somedata as the
++      # command line flag instead of the normal
++      # autogenerated one (--data)
++      cmd_flag  => 'somedata',
++
++      # tells MouseX::Getopt to also allow --moosedata,
++      # -m, and -d as aliases for this same option on
++      # the commandline.
++      cmd_aliases => [qw/ moosedata m d /],
++
++      # Or, you can use a plain scalar for a single alias:
++      cmd_aliases => 'm',
++  );
++
++=head1 DESCRIPTION
++
++This is a custom attribute metaclass which can be used to specify a
++the specific command line flag to use instead of the default one
++which L<MouseX::Getopt> will create for you.
++
++This is certainly not the prettiest way to go about this, but for
++now it works for those who might need such a feature.
++
++=head2 Custom Metaclass alias
++
++This now takes advantage of the Moose 0.19 feature to support
++custom attribute metaclass aliases. This means you can also
++use this as the B<Getopt> alias, like so:
++
++  has 'foo' => (metaclass => 'Getopt', cmd_flag => 'f');
++
++=method B<cmd_flag>
++
++Changes the commandline flag to be this value, instead of the default,
++which is the same as the attribute name.
++
++=method B<cmd_aliases>
++
++Adds more aliases for this commandline flag, useful for short options
++and such.
++
++=method B<has_cmd_flag>
++
++=method B<has_cmd_aliases>
++
++=cut
+diff --git a/lib/MouseX/Getopt/Meta/Attribute/NoGetopt.pm b/lib/MouseX/Getopt/Meta/Attribute/NoGetopt.pm
+new file mode 100644
+index 0000000..07c3bc0
+--- /dev/null
++++ b/lib/MouseX/Getopt/Meta/Attribute/NoGetopt.pm
+@@ -0,0 +1,41 @@
++package MouseX::Getopt::Meta::Attribute::NoGetopt;
++# ABSTRACT: Optional meta attribute for ignoring params
++
++use Mouse;
++
++extends 'Mouse::Meta::Attribute'; # << Mouse extending Mouse :)
++   with 'MouseX::Getopt::Meta::Attribute::Trait::NoGetopt';
++
++no Mouse;
++
++# register this as a metaclass alias ...
++package # stop confusing PAUSE
++    Mouse::Meta::Attribute::Custom::NoGetopt;
++sub register_implementation { 'MouseX::Getopt::Meta::Attribute::NoGetopt' }
++
++1;
++
++=head1 SYNOPSIS
++
++  package App;
++  use Mouse;
++
++  with 'MouseX::Getopt';
++
++  has 'data' => (
++      metaclass => 'NoGetopt',  # do not attempt to capture this param
++      is        => 'ro',
++      isa       => 'Str',
++      default   => 'file.dat',
++  );
++
++=head1 DESCRIPTION
++
++This is a custom attribute metaclass which can be used to specify
++that a specific attribute should B<not> be processed by
++C<MouseX::Getopt>. All you need to do is specify the C<NoGetopt>
++metaclass.
++
++  has 'foo' => (metaclass => 'NoGetopt', ... );
++
++=cut
+diff --git a/lib/MouseX/Getopt/Meta/Attribute/Trait.pm b/lib/MouseX/Getopt/Meta/Attribute/Trait.pm
+new file mode 100644
+index 0000000..a0940d9
+--- /dev/null
++++ b/lib/MouseX/Getopt/Meta/Attribute/Trait.pm
+@@ -0,0 +1,85 @@
++package MouseX::Getopt::Meta::Attribute::Trait;
++# ABSTRACT: Optional meta attribute trait for custom option names
++
++use Mouse::Role;
++use Mouse::Util::TypeConstraints;
++
++has 'cmd_flag' => (
++    is        => 'rw',
++    isa       => 'Str',
++    predicate => 'has_cmd_flag',
++);
++
++# This subtype is to support scalar -> arrayref coercion
++#  without polluting the built-in types
++subtype '_MouseX_Getopt_CmdAliases' => as 'ArrayRef';
++
++coerce '_MouseX_Getopt_CmdAliases'
++    => from 'Str'
++        => via { [$_] };
++
++has 'cmd_aliases' => (
++    is        => 'rw',
++    isa       => '_MouseX_Getopt_CmdAliases',
++    predicate => 'has_cmd_aliases',
++    coerce    => 1,
++);
++
++no Mouse::Util::TypeConstraints;
++no Mouse::Role;
++
++# register this as a metaclass alias ...
++package # stop confusing PAUSE
++    Mouse::Meta::Attribute::Custom::Trait::Getopt;
++sub register_implementation { 'MouseX::Getopt::Meta::Attribute::Trait' }
++
++1;
++
++=head1 SYNOPSIS
++
++  package App;
++  use Mouse;
++
++  with 'MouseX::Getopt';
++
++  has 'data' => (
++      traits    => [ 'Getopt' ],
++      is        => 'ro',
++      isa       => 'Str',
++      default   => 'file.dat',
++
++      # tells MouseX::Getopt to use --somedata as the
++      # command line flag instead of the normal
++      # autogenerated one (--data)
++      cmd_flag  => 'somedata',
++
++      # tells MouseX::Getopt to also allow --moosedata,
++      # -m, and -d as aliases for this same option on
++      # the commandline.
++      cmd_aliases => [qw/ moosedata m d /],
++
++      # Or, you can use a plain scalar for a single alias:
++      cmd_aliases => 'm',
++  );
++
++=head1 DESCRIPTION
++
++This is a custom attribute metaclass trait which can be used to
++specify a the specific command line flag to use instead of the
++default one which L<MouseX::Getopt> will create for you.
++
++=method B<cmd_flag>
++
++Changes the commandline flag to be this value, instead of the default,
++which is the same as the attribute name.
++
++=method B<cmd_aliases>
++
++Adds more aliases for this commandline flag, useful for short options
++and such.
++
++=method B<has_cmd_flag>
++
++=method B<has_cmd_aliases>
++
++=cut
+diff --git a/lib/MouseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm b/lib/MouseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm
+new file mode 100644
+index 0000000..ce11624
+--- /dev/null
++++ b/lib/MouseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm
+@@ -0,0 +1,37 @@
++package MouseX::Getopt::Meta::Attribute::Trait::NoGetopt;
++# ABSTRACT: Optional meta attribute trait for ignoring params
++
++use Mouse::Role;
++no Mouse::Role;
++
++# register this as a metaclass alias ...
++package # stop confusing PAUSE
++    Mouse::Meta::Attribute::Custom::Trait::NoGetopt;
++sub register_implementation { 'MouseX::Getopt::Meta::Attribute::Trait::NoGetopt' }
++
++1;
++
++=head1 SYNOPSIS
++
++  package App;
++  use Mouse;
++
++  with 'MouseX::Getopt';
++
++  has 'data' => (
++      traits  => [ 'NoGetopt' ],  # do not attempt to capture this param
++      is      => 'ro',
++      isa     => 'Str',
++      default => 'file.dat',
++  );
++
++=head1 DESCRIPTION
++
++This is a custom attribute metaclass trait which can be used to
++specify that a specific attribute should B<not> be processed by
++C<MouseX::Getopt>. All you need to do is specify the C<NoGetopt>
++metaclass trait.
++
++  has 'foo' => (traits => [ 'NoGetopt', ... ], ... );
++
++=cut
+diff --git a/lib/MouseX/Getopt/OptionTypeMap.pm b/lib/MouseX/Getopt/OptionTypeMap.pm
+new file mode 100644
+index 0000000..daf7329
+--- /dev/null
++++ b/lib/MouseX/Getopt/OptionTypeMap.pm
+@@ -0,0 +1,85 @@
++package MouseX::Getopt::OptionTypeMap;
++# ABSTRACT: Storage for the option to type mappings
++
++use Mouse 'confess', 'blessed';
++use Mouse::Util::TypeConstraints 'find_type_constraint';
++
++my %option_type_map = (
++    'Bool'     => '!',
++    'Str'      => '=s',
++    'Int'      => '=i',
++    'Num'      => '=f',
++    'ArrayRef' => '=s@',
++    'HashRef'  => '=s%',
++);
++
++sub has_option_type {
++    my (undef, $type_or_name) = @_;
++
++    return 1 if exists $option_type_map{blessed($type_or_name) ? $type_or_name->name : $type_or_name};
++
++    my $current = blessed($type_or_name) ? $type_or_name : find_type_constraint($type_or_name);
++
++    (defined $current)
++        || confess "Could not find the type constraint for '$type_or_name'";
++
++    while (my $parent = $current->parent) {
++        return 1 if exists $option_type_map{$parent->name};
++        $current = $parent;
++    }
++
++    return 0;
++}
++
++sub get_option_type {
++    my (undef, $type_or_name) = @_;
++
++    my $name = blessed($type_or_name) ? $type_or_name->name : $type_or_name;
++
++    return $option_type_map{$name} if exists $option_type_map{$name};
++
++    my $current = ref $type_or_name ? $type_or_name : find_type_constraint($type_or_name);
++
++    (defined $current)
++        || confess "Could not find the type constraint for '$type_or_name'";
++
++    while ( $current = $current->parent ) {
++        return $option_type_map{$current->name}
++            if exists $option_type_map{$current->name};
++    }
++
++    return;
++}
++
++sub add_option_type_to_map {
++    my (undef, $type_name, $option_string) = @_;
++    (defined $type_name && defined $option_string)
++        || confess "You must supply both a type name and an option string";
++
++    if ( blessed($type_name) ) {
++        $type_name = $type_name->name;
++    } else {
++        (find_type_constraint($type_name))
++            || confess "The type constraint '$type_name' does not exist";
++    }
++
++    $option_type_map{$type_name} = $option_string;
++}
++
++no Mouse::Util::TypeConstraints;
++no Mouse;
++
++1;
++
++=head1 DESCRIPTION
++
++See the I<Custom Type Constraints> section in the L<MouseX::Getopt> docs
++for more info about how to use this module.
++
++=method B<has_option_type ($type_or_name)>
++
++=method B<get_option_type ($type_or_name)>
++
++=method B<add_option_type_to_map ($type_name, $option_spec)>
++
++=cut
+diff --git a/lib/MouseX/Getopt/Strict.pm b/lib/MouseX/Getopt/Strict.pm
+new file mode 100644
+index 0000000..0110d85
+--- /dev/null
++++ b/lib/MouseX/Getopt/Strict.pm
+@@ -0,0 +1,26 @@
++package MouseX::Getopt::Strict;
++# ABSTRACT: only make options for attrs with the Getopt metaclass
++
++use Mouse::Role;
++
++with 'MouseX::Getopt';
++
++around '_compute_getopt_attrs' => sub {
++    my $next = shift;
++    my ( $class, @args ) = @_;
++    grep {
++        $_->does("MouseX::Getopt::Meta::Attribute::Trait")
++    } $class->$next(@args);
++};
++
++no Mouse::Role;
++
++1;
++
++=head1 DESCRIPTION
++
++This is an stricter version of C<MouseX::Getopt> which only processes the
++attributes if they explicitly set as C<Getopt> attributes. All other attributes
++are ignored by the command line handler.
++
++=cut
+diff --git a/t/000_load.t b/t/000_load.t
+index a06573d..fad61f3 100644
+--- a/t/000_load.t
++++ b/t/000_load.t
+@@ -6,5 +6,5 @@ use warnings;
+ use Test::More tests => 1;
+ 
+ BEGIN {
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+diff --git a/t/001_basic.t b/t/001_basic.t
+index b7bea2d..843e55b 100644
+--- a/t/001_basic.t
++++ b/t/001_basic.t
+@@ -6,17 +6,17 @@ use warnings;
+ use Test::More tests => 69;
+ 
+ BEGIN {
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+ 
+ {
+     package App;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ 
+     has 'data' => (
+-        metaclass => 'MooseX::Getopt::Meta::Attribute',
++        metaclass => 'MouseX::Getopt::Meta::Attribute',
+         is        => 'ro',
+         isa       => 'Str',
+         default   => 'file.dat',
+@@ -32,7 +32,7 @@ BEGIN {
+     );
+ 
+     has 'horse' => (
+-        metaclass   => 'MooseX::Getopt::Meta::Attribute',
++        metaclass   => 'MouseX::Getopt::Meta::Attribute',
+         is          => 'ro',
+         isa         => 'Str',
+         default     => 'bray',
+@@ -70,7 +70,7 @@ BEGIN {
+     );
+ 
+     has '_private_stuff_cmdline' => (
+-        metaclass => 'MooseX::Getopt::Meta::Attribute',
++        metaclass => 'MouseX::Getopt::Meta::Attribute',
+         is        => 'ro',
+         isa       => 'Int',
+         default   => 832,
+@@ -81,8 +81,8 @@ BEGIN {
+ 
+ foreach my $attr_name (qw(data cow horse _private_stuff_cmdline)) {
+     my $attr = App->meta->get_attribute($attr_name);
+-    isa_ok($attr, 'Moose::Meta::Attribute');
+-    isa_ok($attr, 'MooseX::Getopt::Meta::Attribute');
++    isa_ok($attr, 'Mouse::Meta::Attribute');
++    isa_ok($attr, 'MouseX::Getopt::Meta::Attribute');
+     can_ok($attr, 'cmd_flag');
+     can_ok($attr, 'cmd_aliases');
+ }
+diff --git a/t/002_custom_option_type.t b/t/002_custom_option_type.t
+index 890477d..1afb3a1 100644
+--- a/t/002_custom_option_type.t
++++ b/t/002_custom_option_type.t
+@@ -6,23 +6,23 @@ use warnings;
+ use Test::More tests => 6;
+ 
+ BEGIN {
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+ 
+ {
+     package App;
+-    use Moose;
+-    use Moose::Util::TypeConstraints;
++    use Mouse;
++    use Mouse::Util::TypeConstraints;
+ 
+     use Scalar::Util 'looks_like_number';
+ 
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ 
+     subtype 'ArrayOfInts'
+         => as 'ArrayRef'
+         => where { scalar (grep { looks_like_number($_) } @$_)  };
+ 
+-    MooseX::Getopt::OptionTypeMap->add_option_type_to_map(
++    MouseX::Getopt::OptionTypeMap->add_option_type_to_map(
+         'ArrayOfInts' => '=i@'
+     );
+ 
+diff --git a/t/003_inferred_option_type.t b/t/003_inferred_option_type.t
+index e5ceae9..bc9ad99 100644
+--- a/t/003_inferred_option_type.t
++++ b/t/003_inferred_option_type.t
+@@ -6,17 +6,17 @@ use warnings;
+ use Test::More tests => 5;
+ 
+ BEGIN {
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+ 
+ {
+     package App;
+-    use Moose;
+-    use Moose::Util::TypeConstraints;
++    use Mouse;
++    use Mouse::Util::TypeConstraints;
+ 
+     use Scalar::Util 'looks_like_number';
+ 
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ 
+     subtype 'ArrayOfInts'
+         => as 'ArrayRef'
+diff --git a/t/004_nogetop.t b/t/004_nogetop.t
+index 78da66d..054e148 100644
+--- a/t/004_nogetop.t
++++ b/t/004_nogetop.t
+@@ -7,14 +7,14 @@ use Test::More tests => 9;
+ use Test::Exception;
+ 
+ BEGIN {
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+ 
+ {
+     package App;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ 
+     has 'data' => (
+         metaclass => 'Getopt',
+diff --git a/t/005_strict.t b/t/005_strict.t
+index dd4c6c3..5087a01 100644
+--- a/t/005_strict.t
++++ b/t/005_strict.t
+@@ -7,15 +7,15 @@ use Test::More tests => 10;
+ use Test::Exception;
+ 
+ BEGIN {
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+ 
+ {
+ 
+     package App;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt::Strict';
++    with 'MouseX::Getopt::Strict';
+ 
+     has 'data' => (
+         metaclass => 'Getopt',
+diff --git a/t/006_metaclass_traits.t b/t/006_metaclass_traits.t
+index 7e2a01c..d28124c 100644
+--- a/t/006_metaclass_traits.t
++++ b/t/006_metaclass_traits.t
+@@ -4,20 +4,20 @@ use strict;
+ use warnings;
+ 
+ use Test::More tests => 69;
+-use Test::Moose;
++use Test::Mouse;
+ 
+ BEGIN {
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+ 
+ {
+     package App;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ 
+     has 'data' => (
+-        traits    => [ 'MooseX::Getopt::Meta::Attribute::Trait' ],
++        traits    => [ 'MouseX::Getopt::Meta::Attribute::Trait' ],
+         is        => 'ro',
+         isa       => 'Str',
+         default   => 'file.dat',
+@@ -82,8 +82,8 @@ BEGIN {
+ 
+ foreach my $attr_name (qw(data cow horse _private_stuff_cmdline)) {
+     my $attr = App->meta->get_attribute($attr_name);
+-    isa_ok($attr, 'Moose::Meta::Attribute');
+-    does_ok($attr, 'MooseX::Getopt::Meta::Attribute::Trait');
++    isa_ok($attr, 'Mouse::Meta::Attribute');
++    does_ok($attr, 'MouseX::Getopt::Meta::Attribute::Trait');
+ 
+     can_ok($attr, 'cmd_flag');
+     can_ok($attr, 'cmd_aliases');
+diff --git a/t/007_nogetopt_trait.t b/t/007_nogetopt_trait.t
+index 5ccef57..71a3abe 100644
+--- a/t/007_nogetopt_trait.t
++++ b/t/007_nogetopt_trait.t
+@@ -7,14 +7,14 @@ use Test::More tests => 9;
+ use Test::Exception;
+ 
+ BEGIN {
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+ 
+ {
+     package App;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ 
+     has 'data' => (
+         traits    => ['Getopt'],
+diff --git a/t/008_configfromfile.t b/t/008_configfromfile.t
+index 62e6ed9..f84fa62 100644
+--- a/t/008_configfromfile.t
++++ b/t/008_configfromfile.t
+@@ -7,9 +7,9 @@ use Test::Exception;
+ use Test::More;
+ use File::Spec;
+ 
+-if ( !eval { require MooseX::ConfigFromFile } )
++if ( !eval { require MouseX::ConfigFromFile } )
+ {
+-    plan skip_all => 'Test requires MooseX::ConfigFromFile';
++    plan skip_all => 'Test requires MouseX::ConfigFromFile';
+ }
+ else
+ {
+@@ -19,9 +19,9 @@ else
+ {
+     package App;
+ 
+-    use Moose;
+-    with 'MooseX::Getopt';
+-    with 'MooseX::ConfigFromFile';
++    use Mouse;
++    with 'MouseX::Getopt';
++    with 'MouseX::ConfigFromFile';
+ 
+     has 'config_from_override' => (
+         is       => 'ro',
+@@ -68,7 +68,7 @@ else
+ {
+     package App::DefaultConfigFile;
+ 
+-    use Moose;
++    use Mouse;
+     extends 'App';
+ 
+     has '+configfile' => (
+@@ -79,7 +79,7 @@ else
+ {
+     package App::DefaultConfigFileCodeRef;
+ 
+-    use Moose;
++    use Mouse;
+     extends 'App';
+ 
+     has '+configfile' => (
+@@ -193,17 +193,17 @@ else
+ 
+ {
+     package BaseApp::WithConfig;
+-    use Moose;
+-    with 'MooseX::ConfigFromFile';
++    use Mouse;
++    with 'MouseX::ConfigFromFile';
+ 
+     sub get_config_from_file { return {}; }
+ }
+ 
+ {
+     package DerivedApp::Getopt;
+-    use Moose;
++    use Mouse;
+     extends 'BaseApp::WithConfig';
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ }
+ 
+ # With DerivedApp, the Getopt role was applied at a different level
+diff --git a/t/009_gld_and_explicit_options.t b/t/009_gld_and_explicit_options.t
+index aa2761c..ff91e4f 100644
+--- a/t/009_gld_and_explicit_options.t
++++ b/t/009_gld_and_explicit_options.t
+@@ -10,14 +10,14 @@ BEGIN {
+     eval 'use Getopt::Long::Descriptive;';
+     plan skip_all => "Getopt::Long::Descriptive required for this test" if $@;
+     plan tests => 5;
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+ 
+ {
+     package Testing::Foo;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ 
+     has 'bar' => (
+         is       => 'ro',
+diff --git a/t/010_dashes.t b/t/010_dashes.t
+index 52b7849..967ec9b 100644
+--- a/t/010_dashes.t
++++ b/t/010_dashes.t
+@@ -9,14 +9,14 @@ use Test::Exception;
+ 
+ 
+ BEGIN {
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+ 
+ {
+     package App;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt::Dashes';
++    with 'MouseX::Getopt::Dashes';
+ 
+     has 'some_thingy' => ( is => 'ro', isa => 'Str', default => 'foo' );
+     has 'another_thingy'   => ( is => 'ro', isa => 'Str', default => 'foo', cmd_flag => 'another_thingy', traits => [ 'Getopt' ], );
+diff --git a/t/100_gld_default_bug.t b/t/100_gld_default_bug.t
+index 29ae2a4..37d0a19 100644
+--- a/t/100_gld_default_bug.t
++++ b/t/100_gld_default_bug.t
+@@ -10,14 +10,14 @@ BEGIN {
+     eval 'use Getopt::Long::Descriptive;';
+     plan skip_all => "Getopt::Long::Descriptive required for this test" if $@;
+     plan tests => 5;
+-    use_ok('MooseX::Getopt');
++    use_ok('MouseX::Getopt');
+ }
+ 
+ {
+     package Engine::Foo;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ 
+     has 'nproc' => (
+         metaclass   => 'Getopt',
+diff --git a/t/101_argv_bug.t b/t/101_argv_bug.t
+index 6d75ad5..d870783 100644
+--- a/t/101_argv_bug.t
++++ b/t/101_argv_bug.t
+@@ -5,13 +5,13 @@ use warnings;
+ 
+ use Test::More tests => 3;
+ 
+-use MooseX::Getopt;
++use MouseX::Getopt;
+ 
+ {
+     package App;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ 
+     has 'length' => (
+         is      => 'ro',
+@@ -24,7 +24,7 @@ use MooseX::Getopt;
+         isa    => 'Bool',
+         default => 0,
+     );
+-    no Moose;
++    no Mouse;
+ }
+ 
+ {
+diff --git a/t/102_basic_basic.t b/t/102_basic_basic.t
+index daf32f3..cd03bde 100644
+--- a/t/102_basic_basic.t
++++ b/t/102_basic_basic.t
+@@ -6,17 +6,17 @@ use warnings;
+ use Test::More tests => 69;
+ 
+ BEGIN {
+-    use_ok('MooseX::Getopt::Basic');
++    use_ok('MouseX::Getopt::Basic');
+ }
+ 
+ {
+     package App;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt::Basic';
++    with 'MouseX::Getopt::Basic';
+ 
+     has 'data' => (
+-        metaclass => 'MooseX::Getopt::Meta::Attribute',
++        metaclass => 'MouseX::Getopt::Meta::Attribute',
+         is        => 'ro',
+         isa       => 'Str',
+         default   => 'file.dat',
+@@ -32,7 +32,7 @@ BEGIN {
+     );
+ 
+     has 'horse' => (
+-        metaclass   => 'MooseX::Getopt::Meta::Attribute',
++        metaclass   => 'MouseX::Getopt::Meta::Attribute',
+         is          => 'ro',
+         isa         => 'Str',
+         default     => 'bray',
+@@ -70,7 +70,7 @@ BEGIN {
+     );
+ 
+     has '_private_stuff_cmdline' => (
+-        metaclass => 'MooseX::Getopt::Meta::Attribute',
++        metaclass => 'MouseX::Getopt::Meta::Attribute',
+         is        => 'ro',
+         isa       => 'Int',
+         default   => 832,
+@@ -81,8 +81,8 @@ BEGIN {
+ 
+ foreach my $attr_name (qw(data cow horse _private_stuff_cmdline)) {
+     my $attr = App->meta->get_attribute($attr_name);
+-    isa_ok($attr, 'Moose::Meta::Attribute');
+-    isa_ok($attr, 'MooseX::Getopt::Meta::Attribute');
++    isa_ok($attr, 'Mouse::Meta::Attribute');
++    isa_ok($attr, 'MouseX::Getopt::Meta::Attribute');
+     can_ok($attr, 'cmd_flag');
+     can_ok($attr, 'cmd_aliases');
+ }
+diff --git a/t/103_uc_bug.t b/t/103_uc_bug.t
+index 79f5598..14404bd 100644
+--- a/t/103_uc_bug.t
++++ b/t/103_uc_bug.t
+@@ -7,8 +7,8 @@ use Test::More tests => 3;
+ 
+ {
+     package App;
+-    use Moose;
+-    with qw(MooseX::Getopt);
++    use Mouse;
++    with qw(MouseX::Getopt);
+ 
+     has 'TrackingNumber' => (
+         is  => 'rw',
+diff --git a/t/104_override_usage.t b/t/104_override_usage.t
+index d3d0868..2d9c690 100644
+--- a/t/104_override_usage.t
++++ b/t/104_override_usage.t
+@@ -5,9 +5,9 @@ use Test::Exception;
+ 
+ {
+     package MyScript;
+-    use Moose;
++    use Mouse;
+ 
+-    with 'MooseX::Getopt';
++    with 'MouseX::Getopt';
+ 
+     has foo => ( isa => 'Int', is => 'ro', documentation => 'A foo' );
+ 
+diff --git a/t/105_uc_bug_more.t b/t/105_uc_bug_more.t
+index 061dc97..af95831 100644
+--- a/t/105_uc_bug_more.t
++++ b/t/105_uc_bug_more.t
+@@ -1,18 +1,18 @@
+ use strict;
+ use warnings;
+ use Test::More;
+-use Moose ();
+-use Moose::Meta::Class;
++use Mouse ();
++use Mouse::Meta::Class;
+ 
+ foreach my $role (qw/
+-    MooseX::Getopt
+-    MooseX::Getopt::GLD
+-    MooseX::Getopt::Basic
++    MouseX::Getopt
++    MouseX::Getopt::GLD
++    MouseX::Getopt::Basic
+ /) {
+-    Class::MOP::load_class($role);
++    Mouse::Util::load_class($role);
+ 
+-    my $meta = Moose::Meta::Class->create_anon_class(
+-        superclasses => ['Moose::Object'],
++    my $meta = Mouse::Meta::Class->create_anon_class(
++        superclasses => ['Mouse::Object'],
+     );
+     $meta->add_attribute('Debug', traits => ['Getopt'], isa => 'Bool',
+         cmd_aliases => ['d'], is => 'ro');
+diff --git a/t/106_no_ignore_case.t b/t/106_no_ignore_case.t
+index 709ec65..72c3ff6 100644
+--- a/t/106_no_ignore_case.t
++++ b/t/106_no_ignore_case.t
+@@ -1,18 +1,18 @@
+ use strict;
+ use warnings;
+ use Test::More;
+-use Moose ();
+-use Moose::Meta::Class;
++use Mouse ();
++use Mouse::Meta::Class;
+ 
+ foreach my $role (qw/
+-    MooseX::Getopt
+-    MooseX::Getopt::GLD
+-    MooseX::Getopt::Basic
++    MouseX::Getopt
++    MouseX::Getopt::GLD
++    MouseX::Getopt::Basic
+ /) {
+-    Class::MOP::load_class($role);
++    Mouse::Util::load_class($role);
+ 
+-    my $meta = Moose::Meta::Class->create_anon_class(
+-        superclasses => ['Moose::Object'],
++    my $meta = Mouse::Meta::Class->create_anon_class(
++        superclasses => ['Mouse::Object'],
+     );
+     $meta->add_attribute('BigD', traits => ['Getopt'], isa => 'Bool',
+         cmd_aliases => ['D'], is => 'ro');
+diff --git a/t/107_no_auto_help.t b/t/107_no_auto_help.t
+index 5521bc2..429eb45 100644
+--- a/t/107_no_auto_help.t
++++ b/t/107_no_auto_help.t
+@@ -6,15 +6,15 @@
+ 
+ # Summary: If we disable the "auto_help" option in Getopt::Long, then
+ # getoptions() will not call into pod2usage() (causing program termination)
+-# when --help is passed (and MooseX::ConfigFromFile is in use).
++# when --help is passed (and MouseX::ConfigFromFile is in use).
+ use strict;
+ use warnings;
+ 
+ use Test::More;
+ 
+ BEGIN {
+-plan skip_all => 'This test needs MooseX::SimpleConfig 0.07'
+-    unless eval { require MooseX::SimpleConfig && MooseX::SimpleConfig->VERSION(0.07); };
++plan skip_all => 'This test needs MouseX::SimpleConfig 0.07'
++    unless eval { require MouseX::SimpleConfig && MouseX::SimpleConfig->VERSION(0.07); };
+ }
+ 
+ my $fail_on_exit = 1;
+@@ -22,10 +22,10 @@ my $fail_on_exit = 1;
+     package Class;
+     use strict; use warnings;
+ 
+-    use Moose;
++    use Mouse;
+     with
+-        'MooseX::SimpleConfig',
+-        'MooseX::Getopt';
++        'MouseX::SimpleConfig',
++        'MouseX::Getopt';
+ 
+     # this is a hacky way of being able to check that we made it past the
+     # $opt_parser->getoptions() call in new_with_options, because it is
+@@ -38,7 +38,7 @@ my $fail_on_exit = 1;
+         },
+     );
+ 
+-    no Moose;
++    no Mouse;
+     1;
+ }
+ 
+diff --git a/t/108_usage_attr.t b/t/108_usage_attr.t
+index c0286c5..aaf6576 100644
+--- a/t/108_usage_attr.t
++++ b/t/108_usage_attr.t
+@@ -11,21 +11,21 @@ use Test::More tests => 3;
+ {
+     package MyClass;
+     use strict; use warnings;
+-    use Moose;
+-    with 'MooseX::Getopt';
++    use Mouse;
++    with 'MouseX::Getopt';
+ }
+ 
+-Moose::Meta::Class->create('MyClassWithBasic',
++Mouse::Meta::Class->create('MyClassWithBasic',
+     superclasses => ['MyClass'],
+-    roles => [ 'MooseX::Getopt::Basic' ],
++    roles => [ 'MouseX::Getopt::Basic' ],
+ );
+ 
+ my $basic_obj = MyClassWithBasic->new_with_options();
+ ok(!$basic_obj->meta->has_attribute('usage'), 'basic class has no usage attribute');
+ 
+-Moose::Meta::Class->create('MyClassWithGLD',
++Mouse::Meta::Class->create('MyClassWithGLD',
+     superclasses => ['MyClass'],
+-    roles => [ 'MooseX::Getopt' ],
++    roles => [ 'MouseX::Getopt' ],
+ );
+ 
+ my $gld_obj = MyClassWithGLD->new_with_options();
+diff --git a/t/109_help_flag.t b/t/109_help_flag.t
+index af21653..d13a9ed 100644
+--- a/t/109_help_flag.t
++++ b/t/109_help_flag.t
+@@ -23,8 +23,8 @@ use Test::Exception;
+ {
+     package MyClass;
+     use strict; use warnings;
+-    use Moose;
+-    with 'MooseX::Getopt';
++    use Mouse;
++    with 'MouseX::Getopt';
+ }
+ 
+ # before fix, prints this on stderr:
+diff --git a/t/110_sort_usage_by_attr_order.t b/t/110_sort_usage_by_attr_order.t
+index 1e41e79..1a89329 100644
+--- a/t/110_sort_usage_by_attr_order.t
++++ b/t/110_sort_usage_by_attr_order.t
+@@ -3,7 +3,7 @@
+ # attributes, except the order is not deterministic (rather, it uses the order
+ # in which the attributes are stored in the metaclass 'attributes' hash).
+ # Let's sort them by insertion order, which should lead to nicer output:
+-# If MooseX::Getopt is applied early, the help options will be on top
++# If MouseX::Getopt is applied early, the help options will be on top
+ # the help options will always be on top (assuming this role is applied
+ # early), followed by options added by parent classes and roles, and then
+ # options added by this class.
+@@ -15,8 +15,8 @@ use Test::Exception;
+ {
+     package MyClass;
+     use strict; use warnings;
+-    use Moose;
+-    with 'MooseX::Getopt';
++    use Mouse;
++    with 'MouseX::Getopt';
+ 
+     has $_ => (
+         is => 'ro', isa => 'Str',
+@@ -27,13 +27,13 @@ use Test::Exception;
+ 
+ my $obj = MyClass->new_with_options();
+ 
+-my $expected = <<USAGE;
++my $expected = <<'USAGE';
+ usage: 110_sort_usage_by_attr_order.t [-?] [long options...]
+-	-? --usage --help  Prints this usage information.
+-	--foo              Documentation for "foo"
+-	--bar              Documentation for "bar"
+-	--baz              Documentation for "baz"
++    -? --usage --help  Prints this usage information.
++    --foo              Documentation for "foo"
++    --bar              Documentation for "bar"
++    --baz              Documentation for "baz"
+ USAGE
+-
++$expected =~ s/^[ ]{4}/\t/xmsg;
+ is($obj->usage->text, $expected, 'Usage text has nicely sorted options');
+ 

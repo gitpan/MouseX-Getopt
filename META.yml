@@ -2,30 +2,172 @@
 abstract: 'A Mouse role for processing command line options'
 author:
   - 'NAKAGAWA Masaki <masaki@cpan.org>'
+  - 'FUJI Goro <gfuji@cpan.org>'
+  - 'Stevan Little <stevan@iinteractive.com>'
+  - 'Brandon L. Black <blblack@gmail.com>'
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
+  - 'Ryan D Johnson <ryan@innerfence.com>'
+  - 'Drew Taylor <drew@drewtaylor.com>'
+  - 'Tomas Doran <bobtfish@bobtfish.net>'
+  - 'Florian Ragwitz <rafl@debian.org>'
+  - 'Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>'
+  - 'Avar Arnfjord Bjarmason <avar@cpan.org>'
+  - 'Chris Prather <perigrin@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: 6.42
-  Getopt::Long::Descriptive: 0.077
   Test::Exception: 0.21
-  Test::More: 0.62
-  Test::Mouse: 0
+  Test::More: 0.88
+  Test::Warn: 0.21
 configure_requires:
-  ExtUtils::MakeMaker: 6.42
-distribution_type: module
-generated_by: 'Module::Install version 0.91'
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
-module_name: MouseX::Getopt
 name: MouseX-Getopt
-no_index:
-  directory:
-    - inc
-    - t
 requires:
   Getopt::Long: 2.37
-  Mouse: 0.45
+  Getopt::Long::Descriptive: 0.081
+  Mouse: 0.64
 resources:
-  license: http://dev.perl.org/licenses/
-  repository: git://github.com/gfx/Perl-MouseX-Getopt.git
-version: 0.2601
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MouseX-Getopt
+  homepage: http://search.cpan.org/dist/MouseX-Getopt
+  repository: git://github.com/gfx/mousex-getopt.git
+version: 0.31
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@FLORA/@Basic/GatherDir'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@FLORA/@Basic/PruneCruft'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@FLORA/@Basic/ManifestSkip'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@FLORA/@Basic/MetaYAML'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@FLORA/@Basic/License'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@FLORA/@Basic/Readme'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@FLORA/@Basic/ExtraTests'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@FLORA/@Basic/ExecDir'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@FLORA/@Basic/ShareDir'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@FLORA/@Basic/MakeMaker'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@FLORA/@Basic/Manifest'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@FLORA/@Basic/TestRelease'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@FLORA/@Basic/ConfirmRelease'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@FLORA/@Basic/UploadToCPAN'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@FLORA/MetaConfig'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@FLORA/MetaJSON'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@FLORA/PkgVersion'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@FLORA/PodSyntaxTests'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@FLORA/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@FLORA/PodCoverageTests'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@FLORA/MetaResources'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@FLORA/Authority'
+      version: 1.000
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@FLORA/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@FLORA/PodWeaver'
+      version: 3.101640
+    -
+      class: Dist::Zilla::Plugin::Prereq
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereq
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::Prereq
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.101900
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.101900
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.101900
+x_authority: cpan:STEVAN

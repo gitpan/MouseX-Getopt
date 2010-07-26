@@ -1,5 +1,11 @@
-
 package MouseX::Getopt::OptionTypeMap;
+BEGIN {
+  $MouseX::Getopt::OptionTypeMap::AUTHORITY = 'cpan:STEVAN';
+}
+BEGIN {
+  $MouseX::Getopt::OptionTypeMap::VERSION = '0.31';
+}
+# ABSTRACT: Storage for the option to type mappings
 
 use Mouse 'confess', 'blessed';
 use Mouse::Util::TypeConstraints 'find_type_constraint';
@@ -10,7 +16,7 @@ my %option_type_map = (
     'Int'      => '=i',
     'Num'      => '=f',
     'ArrayRef' => '=s@',
-    'HashRef'  => '=s%',    
+    'HashRef'  => '=s%',
 );
 
 sub has_option_type {
@@ -19,10 +25,10 @@ sub has_option_type {
     return 1 if exists $option_type_map{blessed($type_or_name) ? $type_or_name->name : $type_or_name};
 
     my $current = blessed($type_or_name) ? $type_or_name : find_type_constraint($type_or_name);
-    
+
     (defined $current)
         || confess "Could not find the type constraint for '$type_or_name'";
-    
+
     while (my $parent = $current->parent) {
         return 1 if exists $option_type_map{$parent->name};
         $current = $parent;
@@ -39,9 +45,9 @@ sub get_option_type {
     return $option_type_map{$name} if exists $option_type_map{$name};
 
     my $current = ref $type_or_name ? $type_or_name : find_type_constraint($type_or_name);
-    
+
     (defined $current)
-        || confess "Could not find the type constraint for '$type_or_name'";    
+        || confess "Could not find the type constraint for '$type_or_name'";
 
     while ( $current = $current->parent ) {
         return $option_type_map{$current->name}
@@ -66,12 +72,16 @@ sub add_option_type_to_map {
     $option_type_map{$type_name} = $option_string;
 }
 
-no Mouse; no Mouse::Util::TypeConstraints; 1;
+no Mouse::Util::TypeConstraints;
+no Mouse;
+
+1;
+
 
 __END__
-
-
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -84,22 +94,72 @@ for more info about how to use this module.
 
 =head1 METHODS
 
-These are all class methods and should be called as such.
+=head2 B<has_option_type ($type_or_name)>
+
+=head2 B<get_option_type ($type_or_name)>
+
+=head2 B<add_option_type_to_map ($type_name, $option_spec)>
+
+=head1 AUTHORS
 
 =over 4
 
-=item B<has_option_type ($type_or_name)>
+=item *
 
-=item B<get_option_type ($type_or_name)>
+NAKAGAWA Masaki <masaki@cpan.org>
 
-=item B<add_option_type_to_map ($type_name, $option_spec)>
+=item *
 
-=item B<meta>
+FUJI Goro <gfuji@cpan.org>
+
+=item *
+
+Stevan Little <stevan@iinteractive.com>
+
+=item *
+
+Brandon L. Black <blblack@gmail.com>
+
+=item *
+
+Yuval Kogman <nothingmuch@woobling.org>
+
+=item *
+
+Ryan D Johnson <ryan@innerfence.com>
+
+=item *
+
+Drew Taylor <drew@drewtaylor.com>
+
+=item *
+
+Tomas Doran <bobtfish@bobtfish.net>
+
+=item *
+
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
+
+=item *
+
+Avar Arnfjord Bjarmason <avar@cpan.org>
+
+=item *
+
+Chris Prather <perigrin@cpan.org>
 
 =back
 
-=head1 SEE ALSO
+=head1 COPYRIGHT AND LICENSE
 
-L<MouseX::Getopt>
+This software is copyright (c) 2010 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
+

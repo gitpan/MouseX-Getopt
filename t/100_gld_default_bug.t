@@ -9,16 +9,16 @@ use Test::Exception;
 BEGIN {
     eval 'use Getopt::Long::Descriptive;';
     plan skip_all => "Getopt::Long::Descriptive required for this test" if $@;
-    plan tests => 5;    
+    plan tests => 5;
     use_ok('MouseX::Getopt');
 }
 
 {
     package Engine::Foo;
     use Mouse;
-    
+
     with 'MouseX::Getopt';
-    
+
     has 'nproc' => (
         metaclass   => 'Getopt',
         is          => 'ro',

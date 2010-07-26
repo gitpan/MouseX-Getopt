@@ -1,10 +1,31 @@
-
 package MouseX::Getopt::GLD;
+BEGIN {
+  $MouseX::Getopt::GLD::AUTHORITY = 'cpan:STEVAN';
+}
+BEGIN {
+  $MouseX::Getopt::GLD::VERSION = '0.31';
+}
+# ABSTRACT: A Mouse role for processing command line options with Getopt::Long::Descriptive
+
 use Mouse::Role;
 
-use Getopt::Long::Descriptive;
+use Getopt::Long::Descriptive 0.081;
 
 with 'MouseX::Getopt::Basic';
+
+has usage => (
+    is => 'rw', isa => 'Getopt::Long::Descriptive::Usage',
+    traits => ['NoGetopt'],
+);
+
+# captures the options: --help --usage --?
+has help_flag => (
+    is => 'ro', isa => 'Bool',
+    traits => ['Getopt'],
+    cmd_flag => 'help',
+    cmd_aliases => [ qw(usage ?) ],
+    documentation => 'Prints this usage information.',
+);
 
 around _getopt_spec => sub {
     shift;
@@ -31,9 +52,9 @@ sub _gld_spec {
             {
                 ( ( $opt->{required} && !exists($constructor_params->{$opt->{init_arg}}) ) ? (required => $opt->{required}) : () ),
                 # NOTE:
-                # remove this 'feature' because it didn't work 
+                # remove this 'feature' because it didn't work
                 # all the time, and so is better to not bother
-                # since Mouse will handle the defaults just 
+                # since Mouse will handle the defaults just
                 # fine anyway.
                 # - SL
                 #( exists $opt->{default}  ? (default  => $opt->{default})  : () ),
@@ -49,11 +70,15 @@ sub _gld_spec {
     return ( \@options, \%name_to_init_arg );
 }
 
-no Mouse::Role; 1;
+no Mouse::Role;
+
+1;
+
 
 __END__
-
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -83,8 +108,66 @@ MouseX::Getopt::GLD - A Mouse role for processing command line options with Geto
   ## on the command line
   % perl my_app_script.pl -in file.input -out file.dump
 
-=head1 SEE ALSO
+=head1 AUTHORS
 
-L<MouseX::Getopt>
+=over 4
+
+=item *
+
+NAKAGAWA Masaki <masaki@cpan.org>
+
+=item *
+
+FUJI Goro <gfuji@cpan.org>
+
+=item *
+
+Stevan Little <stevan@iinteractive.com>
+
+=item *
+
+Brandon L. Black <blblack@gmail.com>
+
+=item *
+
+Yuval Kogman <nothingmuch@woobling.org>
+
+=item *
+
+Ryan D Johnson <ryan@innerfence.com>
+
+=item *
+
+Drew Taylor <drew@drewtaylor.com>
+
+=item *
+
+Tomas Doran <bobtfish@bobtfish.net>
+
+=item *
+
+Florian Ragwitz <rafl@debian.org>
+
+=item *
+
+Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
+
+=item *
+
+Avar Arnfjord Bjarmason <avar@cpan.org>
+
+=item *
+
+Chris Prather <perigrin@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
+
