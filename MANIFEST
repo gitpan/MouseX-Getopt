@@ -4,7 +4,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-MouseX-Getopt.diff
 README
 dist.ini
 lib/MouseX/Getopt.pm
