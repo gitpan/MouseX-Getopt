@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $MouseX::Getopt::VERSION = '0.31';
+  $MouseX::Getopt::VERSION = '0.32';
 }
 # ABSTRACT: A Mouse role for processing command line options
 

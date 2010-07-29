@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::Basic::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $MouseX::Getopt::Basic::VERSION = '0.31';
+  $MouseX::Getopt::Basic::VERSION = '0.32';
 }
 # ABSTRACT: MouseX::Getopt::Basic - role to implement the Getopt::Long functionality
 

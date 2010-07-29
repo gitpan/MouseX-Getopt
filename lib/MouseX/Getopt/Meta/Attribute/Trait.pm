@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::Meta::Attribute::Trait::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $MouseX::Getopt::Meta::Attribute::Trait::VERSION = '0.31';
+  $MouseX::Getopt::Meta::Attribute::Trait::VERSION = '0.32';
 }
 # ABSTRACT: Optional meta attribute trait for custom option names
 
@@ -41,7 +41,7 @@ BEGIN {
   $Mouse::Meta::Attribute::Custom::Trait::Getopt::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $Mouse::Meta::Attribute::Custom::Trait::Getopt::VERSION = '0.31';
+  $Mouse::Meta::Attribute::Custom::Trait::Getopt::VERSION = '0.32';
 }
 sub register_implementation { 'MouseX::Getopt::Meta::Attribute::Trait' }
 

@@ -34,7 +34,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MouseX-Getopt
   homepage: http://search.cpan.org/dist/MouseX-Getopt
   repository: git://github.com/gfx/mousex-getopt.git
-version: 0.31
+version: 0.32
 x_Dist_Zilla:
   plugins:
     -

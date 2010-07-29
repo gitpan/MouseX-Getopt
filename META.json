@@ -58,7 +58,7 @@
          "web" : "http://github.com/gfx/mousex-getopt"
       }
    },
-   "version" : "0.31",
+   "version" : "0.32",
    "x_Dist_Zilla" : {
       "plugins" : [
          {

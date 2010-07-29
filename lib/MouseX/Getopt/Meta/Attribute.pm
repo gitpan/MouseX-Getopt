@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::Meta::Attribute::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $MouseX::Getopt::Meta::Attribute::VERSION = '0.31';
+  $MouseX::Getopt::Meta::Attribute::VERSION = '0.32';
 }
 # ABSTRACT: Optional meta attribute for custom option names
 
@@ -22,7 +22,7 @@ BEGIN {
   $Mouse::Meta::Attribute::Custom::Getopt::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $Mouse::Meta::Attribute::Custom::Getopt::VERSION = '0.31';
+  $Mouse::Meta::Attribute::Custom::Getopt::VERSION = '0.32';
 }
 sub register_implementation { 'MouseX::Getopt::Meta::Attribute' }
 

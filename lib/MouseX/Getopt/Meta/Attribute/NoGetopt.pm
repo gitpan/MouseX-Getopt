@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::Meta::Attribute::NoGetopt::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $MouseX::Getopt::Meta::Attribute::NoGetopt::VERSION = '0.31';
+  $MouseX::Getopt::Meta::Attribute::NoGetopt::VERSION = '0.32';
 }
 # ABSTRACT: Optional meta attribute for ignoring params
 
@@ -21,7 +21,7 @@ BEGIN {
   $Mouse::Meta::Attribute::Custom::NoGetopt::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $Mouse::Meta::Attribute::Custom::NoGetopt::VERSION = '0.31';
+  $Mouse::Meta::Attribute::Custom::NoGetopt::VERSION = '0.32';
 }
 sub register_implementation { 'MouseX::Getopt::Meta::Attribute::NoGetopt' }
 
