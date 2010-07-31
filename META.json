@@ -3,6 +3,7 @@
    "author" : [
       "NAKAGAWA Masaki <masaki@cpan.org>",
       "FUJI Goro <gfuji@cpan.org>",
+      "Tokuhiro Matsuno <tokuhirom@cpan.org>",
       "Stevan Little <stevan@iinteractive.com>",
       "Brandon L. Black <blblack@gmail.com>",
       "Yuval Kogman <nothingmuch@woobling.org>",
@@ -58,7 +59,7 @@
          "web" : "http://github.com/gfx/mousex-getopt"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_Dist_Zilla" : {
       "plugins" : [
          {

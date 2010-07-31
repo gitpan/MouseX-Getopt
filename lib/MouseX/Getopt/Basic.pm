@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::Basic::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $MouseX::Getopt::Basic::VERSION = '0.32';
+  $MouseX::Getopt::Basic::VERSION = '0.33';
 }
 # ABSTRACT: MouseX::Getopt::Basic - role to implement the Getopt::Long functionality
 
@@ -291,6 +291,10 @@ NAKAGAWA Masaki <masaki@cpan.org>
 =item *
 
 FUJI Goro <gfuji@cpan.org>
+
+=item *
+
+Tokuhiro Matsuno <tokuhirom@cpan.org>
 
 =item *
 

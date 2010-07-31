@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::OptionTypeMap::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $MouseX::Getopt::OptionTypeMap::VERSION = '0.32';
+  $MouseX::Getopt::OptionTypeMap::VERSION = '0.33';
 }
 # ABSTRACT: Storage for the option to type mappings
 
@@ -111,6 +111,10 @@ NAKAGAWA Masaki <masaki@cpan.org>
 =item *
 
 FUJI Goro <gfuji@cpan.org>
+
+=item *
+
+Tokuhiro Matsuno <tokuhirom@cpan.org>
 
 =item *
 

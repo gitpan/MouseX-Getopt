@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $MouseX::Getopt::VERSION = '0.32';
+  $MouseX::Getopt::VERSION = '0.33';
 }
 # ABSTRACT: A Mouse role for processing command line options
 
@@ -261,6 +261,10 @@ NAKAGAWA Masaki <masaki@cpan.org>
 =item *
 
 FUJI Goro <gfuji@cpan.org>
+
+=item *
+
+Tokuhiro Matsuno <tokuhirom@cpan.org>
 
 =item *
 

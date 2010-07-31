@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::Strict::AUTHORITY = 'cpan:STEVAN';
 }
 BEGIN {
-  $MouseX::Getopt::Strict::VERSION = '0.32';
+  $MouseX::Getopt::Strict::VERSION = '0.33';
 }
 # ABSTRACT: only make options for attrs with the Getopt metaclass
 
@@ -50,6 +50,10 @@ NAKAGAWA Masaki <masaki@cpan.org>
 =item *
 
 FUJI Goro <gfuji@cpan.org>
+
+=item *
+
+Tokuhiro Matsuno <tokuhirom@cpan.org>
 
 =item *
 
