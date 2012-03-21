@@ -1,11 +1,7 @@
 Revision history for Perl extension MouseX-Getopt
 
-0.34 2012-03-21 10:04:14
-
-  * fix configfromfile test to use new Getopt::Long::Descriptive text
-    (mjgardner)
-
 0.33 Sat Jul 31 10:09:23 JST 2010
+
 
   * (no feature change) re-release to fix unauthorized release
 

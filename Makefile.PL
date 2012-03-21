@@ -4,33 +4,33 @@ use warnings;
 
 
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'A Mouse role for processing command line options',
-  'AUTHOR' => 'NAKAGAWA Masaki <masaki@cpan.org>, FUJI Goro <gfuji@cpan.org>, Tokuhiro Matsuno <tokuhirom@cpan.org>, Stevan Little <stevan@iinteractive.com>, Brandon L. Black <blblack@gmail.com>, Yuval Kogman <nothingmuch@woobling.org>, Ryan D Johnson <ryan@innerfence.com>, Drew Taylor <drew@drewtaylor.com>, Tomas Doran <bobtfish@bobtfish.net>, Florian Ragwitz <rafl@debian.org>, Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>, Avar Arnfjord Bjarmason <avar@cpan.org>, Chris Prather <perigrin@cpan.org>',
-  'BUILD_REQUIRES' => {
-    'Test::Exception' => '0.21',
-    'Test::More' => '0.88',
-    'Test::Warn' => '0.21'
+  "ABSTRACT" => "A Mouse role for processing command line options",
+  "AUTHOR" => "NAKAGAWA Masaki <masaki\@cpan.org>, FUJI Goro <gfuji\@cpan.org>, Stevan Little <stevan\@iinteractive.com>, Brandon L. Black <blblack\@gmail.com>, Yuval Kogman <nothingmuch\@woobling.org>, Ryan D Johnson <ryan\@innerfence.com>, Drew Taylor <drew\@drewtaylor.com>, Tomas Doran <bobtfish\@bobtfish.net>, Florian Ragwitz <rafl\@debian.org>, Dagfinn Ilmari Mannsaker <ilmari\@ilmari.org>, Avar Arnfjord Bjarmason <avar\@cpan.org>, Chris Prather <perigrin\@cpan.org>, Mark Gardner <mjgardner\@cpan.org>",
+  "BUILD_REQUIRES" => {
+    "Test::Exception" => "0.21",
+    "Test::More" => "0.88",
+    "Test::Warn" => "0.21"
   },
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31'
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
   },
-  'DISTNAME' => 'MouseX-Getopt',
-  'EXE_FILES' => [],
-  'LICENSE' => 'perl',
-  'NAME' => 'MouseX::Getopt',
-  'PREREQ_PM' => {
-    'Getopt::Long' => '2.37',
-    'Getopt::Long::Descriptive' => '0.081',
-    'Mouse' => '0.64'
+  "DISTNAME" => "MouseX-Getopt",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "MouseX::Getopt",
+  "PREREQ_PM" => {
+    "Getopt::Long" => "2.37",
+    "Getopt::Long::Descriptive" => "0.091",
+    "Mouse" => "0.64"
   },
-  'VERSION' => '0.33',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "0.32",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 

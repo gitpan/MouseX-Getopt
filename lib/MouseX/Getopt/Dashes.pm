@@ -2,8 +2,8 @@ package MouseX::Getopt::Dashes;
 BEGIN {
   $MouseX::Getopt::Dashes::AUTHORITY = 'cpan:STEVAN';
 }
-BEGIN {
-  $MouseX::Getopt::Dashes::VERSION = '0.33';
+{
+  $MouseX::Getopt::Dashes::VERSION = '0.32';
 }
 # ABSTRACT: convert underscores in attribute names to dashes
 
@@ -85,10 +85,6 @@ FUJI Goro <gfuji@cpan.org>
 
 =item *
 
-Tokuhiro Matsuno <tokuhirom@cpan.org>
-
-=item *
-
 Stevan Little <stevan@iinteractive.com>
 
 =item *
@@ -127,11 +123,15 @@ Avar Arnfjord Bjarmason <avar@cpan.org>
 
 Chris Prather <perigrin@cpan.org>
 
+=item *
+
+Mark Gardner <mjgardner@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Infinity Interactive, Inc.
+This software is copyright (c) 2012 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

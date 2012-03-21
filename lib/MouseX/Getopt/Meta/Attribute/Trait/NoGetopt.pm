@@ -2,8 +2,8 @@ package MouseX::Getopt::Meta::Attribute::Trait::NoGetopt;
 BEGIN {
   $MouseX::Getopt::Meta::Attribute::Trait::NoGetopt::AUTHORITY = 'cpan:STEVAN';
 }
-BEGIN {
-  $MouseX::Getopt::Meta::Attribute::Trait::NoGetopt::VERSION = '0.33';
+{
+  $MouseX::Getopt::Meta::Attribute::Trait::NoGetopt::VERSION = '0.32';
 }
 # ABSTRACT: Optional meta attribute trait for ignoring params
 
@@ -13,12 +13,6 @@ no Mouse::Role;
 # register this as a metaclass alias ...
 package # stop confusing PAUSE
     Mouse::Meta::Attribute::Custom::Trait::NoGetopt;
-BEGIN {
-  $Mouse::Meta::Attribute::Custom::Trait::NoGetopt::AUTHORITY = 'cpan:STEVAN';
-}
-BEGIN {
-  $Mouse::Meta::Attribute::Custom::Trait::NoGetopt::VERSION = '0.33';
-}
 sub register_implementation { 'MouseX::Getopt::Meta::Attribute::Trait::NoGetopt' }
 
 1;
@@ -70,10 +64,6 @@ FUJI Goro <gfuji@cpan.org>
 
 =item *
 
-Tokuhiro Matsuno <tokuhirom@cpan.org>
-
-=item *
-
 Stevan Little <stevan@iinteractive.com>
 
 =item *
@@ -112,11 +102,15 @@ Avar Arnfjord Bjarmason <avar@cpan.org>
 
 Chris Prather <perigrin@cpan.org>
 
+=item *
+
+Mark Gardner <mjgardner@cpan.org>
+
 =back
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Infinity Interactive, Inc.
+This software is copyright (c) 2012 by Infinity Interactive, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
