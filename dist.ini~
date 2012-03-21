@@ -28,7 +28,7 @@ Getopt::Long = 2.37
 Getopt::Long::Descriptive = 0.091
 Mouse = 0.64
 
-[Prereqs / TestRequires]
+[Prereq / TestRequires]
 Test::Exception = 0.21
 Test::Warn = 0.21
 Test::More = 0.88

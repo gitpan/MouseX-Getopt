@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::OptionTypeMap::AUTHORITY = 'cpan:STEVAN';
 }
 {
-  $MouseX::Getopt::OptionTypeMap::VERSION = '0.32';
+  $MouseX::Getopt::OptionTypeMap::VERSION = '0.34';
 }
 # ABSTRACT: Storage for the option to type mappings
 

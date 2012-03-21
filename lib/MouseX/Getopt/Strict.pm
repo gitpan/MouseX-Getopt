@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::Strict::AUTHORITY = 'cpan:STEVAN';
 }
 {
-  $MouseX::Getopt::Strict::VERSION = '0.32';
+  $MouseX::Getopt::Strict::VERSION = '0.34';
 }
 # ABSTRACT: only make options for attrs with the Getopt metaclass
 

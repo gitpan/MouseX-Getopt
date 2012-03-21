@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::GLD::AUTHORITY = 'cpan:STEVAN';
 }
 {
-  $MouseX::Getopt::GLD::VERSION = '0.32';
+  $MouseX::Getopt::GLD::VERSION = '0.34';
 }
 # ABSTRACT: A Mouse role for processing command line options with Getopt::Long::Descriptive
 

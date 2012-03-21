@@ -3,7 +3,7 @@ BEGIN {
   $MouseX::Getopt::Meta::Attribute::NoGetopt::AUTHORITY = 'cpan:STEVAN';
 }
 {
-  $MouseX::Getopt::Meta::Attribute::NoGetopt::VERSION = '0.32';
+  $MouseX::Getopt::Meta::Attribute::NoGetopt::VERSION = '0.34';
 }
 # ABSTRACT: Optional meta attribute for ignoring params
 

@@ -59,7 +59,7 @@
          "web" : "http://github.com/gfx/mousex-getopt"
       }
    },
-   "version" : "0.32",
+   "version" : "0.34",
    "x_Dist_Zilla" : {
       "plugins" : [
          {
@@ -183,18 +183,18 @@
             "version" : "3.101641"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Prereq",
+            "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
                "Dist::Zilla::Plugin::Prereqs" : {
                   "phase" : "runtime",
                   "type" : "requires"
                }
             },
-            "name" : "Prereq",
+            "name" : "Prereqs",
             "version" : "4.300010"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Prereq",
+            "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
                "Dist::Zilla::Plugin::Prereqs" : {
                   "phase" : "test",
