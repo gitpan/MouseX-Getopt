@@ -1,10 +1,4 @@
 package MouseX::Getopt::Meta::Attribute;
-BEGIN {
-  $MouseX::Getopt::Meta::Attribute::AUTHORITY = 'cpan:STEVAN';
-}
-{
-  $MouseX::Getopt::Meta::Attribute::VERSION = '0.34';
-}
 # ABSTRACT: Optional meta attribute for custom option names
 
 use Mouse;
@@ -22,15 +16,7 @@ sub register_implementation { 'MouseX::Getopt::Meta::Attribute' }
 
 1;
 
-
-__END__
-=pod
-
-=encoding utf-8
-
-=head1 NAME
-
-MouseX::Getopt::Meta::Attribute - Optional meta attribute for custom option names
+=for stopwords metaclass commandline params configfile
 
 =head1 SYNOPSIS
 
@@ -76,86 +62,22 @@ use this as the B<Getopt> alias, like so:
 
   has 'foo' => (metaclass => 'Getopt', cmd_flag => 'f');
 
-=head1 METHODS
+=over 4
 
-=head2 B<cmd_flag>
+=item B<cmd_flag>
 
 Changes the commandline flag to be this value, instead of the default,
 which is the same as the attribute name.
 
-=head2 B<cmd_aliases>
+=item B<cmd_aliases>
 
 Adds more aliases for this commandline flag, useful for short options
 and such.
 
-=head2 B<has_cmd_flag>
+=item B<has_cmd_flag>
 
-=head2 B<has_cmd_aliases>
-
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-NAKAGAWA Masaki <masaki@cpan.org>
-
-=item *
-
-FUJI Goro <gfuji@cpan.org>
-
-=item *
-
-Stevan Little <stevan@iinteractive.com>
-
-=item *
-
-Brandon L. Black <blblack@gmail.com>
-
-=item *
-
-Yuval Kogman <nothingmuch@woobling.org>
-
-=item *
-
-Ryan D Johnson <ryan@innerfence.com>
-
-=item *
-
-Drew Taylor <drew@drewtaylor.com>
-
-=item *
-
-Tomas Doran <bobtfish@bobtfish.net>
-
-=item *
-
-Florian Ragwitz <rafl@debian.org>
-
-=item *
-
-Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
-
-=item *
-
-Avar Arnfjord Bjarmason <avar@cpan.org>
-
-=item *
-
-Chris Prather <perigrin@cpan.org>
-
-=item *
-
-Mark Gardner <mjgardner@cpan.org>
+=item B<has_cmd_aliases>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Infinity Interactive, Inc.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-

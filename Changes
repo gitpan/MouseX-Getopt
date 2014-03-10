@@ -1,13 +1,11 @@
 Revision history for Perl extension MouseX-Getopt
 
-0.34 2012-03-21 10:04:14
+0.35 2014-03-10T07:02:02Z
 
-  * fix configfromfile test to use new Getopt::Long::Descriptive text
-    (mjgardner)
-
-0.33 Sat Jul 31 10:09:23 JST 2010
-
-  * (no feature change) re-release to fix unauthorized release
+  * GLD 0.097 no longer defaults to no_ignore_case
+    https://rt.cpan.org/Public/Bug/Display.html?id=93593
+    See also
+    https://github.com/moose/MooseX-Getopt/commit/c8459ee3ab47cdd7e0b1ccde1787f
 
 0.32 Thu Jul 29 20:21:56 JST 2010
 

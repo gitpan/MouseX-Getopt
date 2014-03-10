@@ -1,10 +1,4 @@
 package MouseX::Getopt::Basic;
-BEGIN {
-  $MouseX::Getopt::Basic::AUTHORITY = 'cpan:STEVAN';
-}
-{
-  $MouseX::Getopt::Basic::VERSION = '0.34';
-}
 # ABSTRACT: MouseX::Getopt::Basic - role to implement the Getopt::Long functionality
 
 use Mouse::Role;
@@ -235,16 +229,6 @@ sub _attrs_to_options {
 no Mouse::Role;
 1;
 
-
-__END__
-=pod
-
-=encoding utf-8
-
-=head1 NAME
-
-MouseX::Getopt::Basic - MouseX::Getopt::Basic - role to implement the Getopt::Long functionality
-
 =head1 SYNOPSIS
 
   ## In your class
@@ -274,76 +258,12 @@ MouseX::Getopt::Basic - MouseX::Getopt::Basic - role to implement the Getopt::Lo
 This is like L<MouseX::Getopt> and can be used instead except that it
 doesn't make use of L<Getopt::Long::Descriptive> (or "GLD" for short).
 
-=head1 METHODS
+=over 4
 
-=head2 new_with_options
+=item new_with_options
 
 See L<MouseX::Getopt/new_with_options>.
 
-=head1 AUTHORS
-
-=over 4
-
-=item *
-
-NAKAGAWA Masaki <masaki@cpan.org>
-
-=item *
-
-FUJI Goro <gfuji@cpan.org>
-
-=item *
-
-Stevan Little <stevan@iinteractive.com>
-
-=item *
-
-Brandon L. Black <blblack@gmail.com>
-
-=item *
-
-Yuval Kogman <nothingmuch@woobling.org>
-
-=item *
-
-Ryan D Johnson <ryan@innerfence.com>
-
-=item *
-
-Drew Taylor <drew@drewtaylor.com>
-
-=item *
-
-Tomas Doran <bobtfish@bobtfish.net>
-
-=item *
-
-Florian Ragwitz <rafl@debian.org>
-
-=item *
-
-Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
-
-=item *
-
-Avar Arnfjord Bjarmason <avar@cpan.org>
-
-=item *
-
-Chris Prather <perigrin@cpan.org>
-
-=item *
-
-Mark Gardner <mjgardner@cpan.org>
-
 =back
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Infinity Interactive, Inc.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-

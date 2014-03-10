@@ -1,182 +1,95 @@
 ---
 abstract: 'A Mouse role for processing command line options'
 author:
-  - 'NAKAGAWA Masaki <masaki@cpan.org>'
-  - 'FUJI Goro <gfuji@cpan.org>'
-  - 'Stevan Little <stevan@iinteractive.com>'
-  - 'Brandon L. Black <blblack@gmail.com>'
-  - 'Yuval Kogman <nothingmuch@woobling.org>'
-  - 'Ryan D Johnson <ryan@innerfence.com>'
-  - 'Drew Taylor <drew@drewtaylor.com>'
-  - 'Tomas Doran <bobtfish@bobtfish.net>'
-  - 'Florian Ragwitz <rafl@debian.org>'
-  - 'Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>'
-  - 'Avar Arnfjord Bjarmason <avar@cpan.org>'
-  - 'Chris Prather <perigrin@cpan.org>'
-  - 'Mark Gardner <mjgardner@cpan.org>'
+  - '=over 4'
 build_requires:
+  Mouse::Meta::Class: 0
+  MouseX::ConfigFromFile: 0
+  MouseX::SimpleConfig: 0
+  Scalar::Util: 0
   Test::Exception: 0.21
   Test::More: 0.88
+  Test::Mouse: 0
   Test::Warn: 0.21
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+generated_by: 'Minilla/v0.11.1, CPAN::Meta::Converter version 2.133380'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
-name: MouseX-Getopt
+name: mousex-getopt
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  MouseX::Getopt:
+    file: lib/MouseX/Getopt.pm
+    version: 0.35
+  MouseX::Getopt::Basic:
+    file: lib/MouseX/Getopt/Basic.pm
+  MouseX::Getopt::Dashes:
+    file: lib/MouseX/Getopt/Dashes.pm
+  MouseX::Getopt::GLD:
+    file: lib/MouseX/Getopt/GLD.pm
+  MouseX::Getopt::Meta::Attribute:
+    file: lib/MouseX/Getopt/Meta/Attribute.pm
+  MouseX::Getopt::Meta::Attribute::NoGetopt:
+    file: lib/MouseX/Getopt/Meta/Attribute/NoGetopt.pm
+  MouseX::Getopt::Meta::Attribute::Trait:
+    file: lib/MouseX/Getopt/Meta/Attribute/Trait.pm
+  MouseX::Getopt::Meta::Attribute::Trait::NoGetopt:
+    file: lib/MouseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm
+  MouseX::Getopt::OptionTypeMap:
+    file: lib/MouseX/Getopt/OptionTypeMap.pm
+  MouseX::Getopt::Strict:
+    file: lib/MouseX/Getopt/Strict.pm
 requires:
   Getopt::Long: 2.37
   Getopt::Long::Descriptive: 0.091
   Mouse: 0.64
+  Mouse::Meta::Attribute: 0
+  Mouse::Role: 0
+  Mouse::Util::TypeConstraints: 0
 resources:
-  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=MouseX-Getopt
-  homepage: http://metacpan.org/release/MouseX-Getopt
+  bugtracker: https://github.com/gfx/mousex-getopt/issues
+  homepage: https://github.com/gfx/mousex-getopt
   repository: git://github.com/gfx/mousex-getopt.git
-version: 0.34
-x_Dist_Zilla:
-  plugins:
-    -
-      class: Dist::Zilla::Plugin::GatherDir
-      name: '@FLORA/@Basic/GatherDir'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::PruneCruft
-      name: '@FLORA/@Basic/PruneCruft'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::ManifestSkip
-      name: '@FLORA/@Basic/ManifestSkip'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::MetaYAML
-      name: '@FLORA/@Basic/MetaYAML'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::License
-      name: '@FLORA/@Basic/License'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::Readme
-      name: '@FLORA/@Basic/Readme'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::ExtraTests
-      name: '@FLORA/@Basic/ExtraTests'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::ExecDir
-      name: '@FLORA/@Basic/ExecDir'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::ShareDir
-      name: '@FLORA/@Basic/ShareDir'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::MakeMaker
-      name: '@FLORA/@Basic/MakeMaker'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::Manifest
-      name: '@FLORA/@Basic/Manifest'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::TestRelease
-      name: '@FLORA/@Basic/TestRelease'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::ConfirmRelease
-      name: '@FLORA/@Basic/ConfirmRelease'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::UploadToCPAN
-      name: '@FLORA/@Basic/UploadToCPAN'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::MetaConfig
-      name: '@FLORA/MetaConfig'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::MetaJSON
-      name: '@FLORA/MetaJSON'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::PkgVersion
-      name: '@FLORA/PkgVersion'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::PodSyntaxTests
-      name: '@FLORA/PodSyntaxTests'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::NoTabsTests
-      name: '@FLORA/NoTabsTests'
-      version: 0.01
-    -
-      class: Dist::Zilla::Plugin::PodCoverageTests
-      name: '@FLORA/PodCoverageTests'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: '@FLORA/MetaResources'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::Authority
-      name: '@FLORA/Authority'
-      version: 1.006
-    -
-      class: Dist::Zilla::Plugin::EOLTests
-      name: '@FLORA/EOLTests'
-      version: 0.02
-    -
-      class: Dist::Zilla::Plugin::PodWeaver
-      name: '@FLORA/PodWeaver'
-      version: 3.101641
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: runtime
-          type: requires
-      name: Prereqs
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::Prereqs
-      config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: test
-          type: requires
-      name: TestRequires
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':InstallModules'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':IncModules'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':TestFiles'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':ExecFiles'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':ShareFiles'
-      version: 4.300010
-    -
-      class: Dist::Zilla::Plugin::FinderCode
-      name: ':MainModule'
-      version: 4.300010
-  zilla:
-    class: Dist::Zilla::Dist::Builder
-    config:
-      is_trial: 0
-    version: 4.300010
-x_authority: cpan:STEVAN
+version: 0.35
+x_authority: cpan:GFUJI
+x_contributors:
+  - 'Brandon L Black <blblack@gmail.com>'
+  - 'Ryan D Johnson <ryan@innerfence.com>'
+  - 'Todd Hepler <thepler@employees.org>'
+  - 'John Goulah <jgoulah@cpan.org>'
+  - 'Chris Prather <chris@prather.org>'
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
+  - 'Dagfinn Ilmari MannsÃ¥ker <ilmari@ilmari.org>'
+  - 'Hans Dieter Pearcey <hdp@weftsoar.net>'
+  - 'Nelo Onyiah <nelo.onyiah@gmail.com>'
+  - 'Ricardo SIGNES <rjbs@cpan.org>'
+  - 'Devin Austin <devin@devin-laptop.(none)>'
+  - 'Gordon Irving <goraxe@goraxe.me.uk>'
+  - 'Shlomi Fish <shlomif@iglu.org.il>'
+  - 'Hinrik Ãrn SigurÃ°sson <hinrik.sig@gmail.com>'
+  - 'Tomas Doran (t0m) <t0m@state51.co.uk>'
+  - 'Ãvar ArnfjÃ¶rÃ° Bjarmason <avarab@gmail.com>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Florian Ragwitz <rafl@debian.org>'
+  - 'Karen Etheridge <karen@etheridge.ca>'
+  - 'Justin Hunter <justin.d.hunter@gmail.com>'
+  - 'Tomas Doran <bobtfish@bobtfish.net>'
+  - 'Mark Gardner <gardnerm@gsicommerce.com>'
+  - 'Fuji, Goro <gfuji@cpan.org>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

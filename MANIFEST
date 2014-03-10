@@ -1,13 +1,9 @@
-ChangeLog
-ChangeLog~
+Build.PL
+Changes
 LICENSE
-MANIFEST
 META.json
-META.yml
-Makefile.PL
-README
-dist.ini
-dist.ini~
+README.md
+cpanfile
 lib/MouseX/Getopt.pm
 lib/MouseX/Getopt/Basic.pm
 lib/MouseX/Getopt/Dashes.pm
@@ -18,6 +14,7 @@ lib/MouseX/Getopt/Meta/Attribute/Trait.pm
 lib/MouseX/Getopt/Meta/Attribute/Trait/NoGetopt.pm
 lib/MouseX/Getopt/OptionTypeMap.pm
 lib/MouseX/Getopt/Strict.pm
+minil.toml
 t/000_load.t
 t/001_basic.t
 t/002_custom_option_type.t
@@ -40,7 +37,5 @@ t/107_no_auto_help.t
 t/108_usage_attr.t
 t/109_help_flag.t
 t/110_sort_usage_by_attr_order.t
-t/release-eol.t
-t/release-no-tabs.t
-t/release-pod-coverage.t
-t/release-pod-syntax.t
+META.yml
+MANIFEST

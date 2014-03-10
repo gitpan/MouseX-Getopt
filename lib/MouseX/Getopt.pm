@@ -1,11 +1,7 @@
 package MouseX::Getopt;
-BEGIN {
-  $MouseX::Getopt::AUTHORITY = 'cpan:STEVAN';
-}
-{
-  $MouseX::Getopt::VERSION = '0.34';
-}
 # ABSTRACT: A Mouse role for processing command line options
+
+our $VERSION="0.35";
 
 use Mouse::Role;
 
@@ -15,15 +11,7 @@ no Mouse::Role;
 
 1;
 
-
-__END__
-=pod
-
-=encoding utf-8
-
-=head1 NAME
-
-MouseX::Getopt - A Mouse role for processing command line options
+=for stopwords metaclass commandline params configfile
 
 =head1 SYNOPSIS
 
@@ -89,7 +77,7 @@ specified by the C<--configfile> option (or the default you've
 given for the configfile attribute) for you.
 
 Options specified in multiple places follow the following
-precendence order: commandline overrides configfile, which
+precedence order: commandline overrides configfile, which
 overrides explicit new_with_options parameters.
 
 =head2 Supported Type Constraints
@@ -198,9 +186,9 @@ type for it to the C<OptionTypeMap>, it would be treated just
 like a normal C<ArrayRef> type for Getopt purposes (that is,
 C<=s@>).
 
-=head1 METHODS
+=over 4
 
-=head2 B<new_with_options (%params)>
+=item B<new_with_options (%params)>
 
 This method will take a set of default C<%params> and then collect
 params from the command line (possibly overriding those in C<%params>)
@@ -225,86 +213,51 @@ B<documentation> option for each attribute to document.
 If you have L<Getopt::Long::Descriptive> the C<usage> param is also passed to
 C<new> as the usage option.
 
-=head2 B<ARGV>
+=item B<ARGV>
 
 This accessor contains a reference to a copy of the C<@ARGV> array
 as it originally existed at the time of C<new_with_options>.
 
-=head2 B<extra_argv>
+=item B<extra_argv>
 
 This accessor contains an arrayref of leftover C<@ARGV> elements that
 L<Getopt::Long> did not parse.  Note that the real C<@ARGV> is left
 un-mangled.
 
-=head2 B<usage>
+=item B<usage>
 
 This accessor contains the L<Getopt::Long::Descriptive::Usage> object (if
 L<Getopt::Long::Descriptive> is used).
 
-=head2 B<help_flag>
+=item B<help_flag>
 
 This accessor contains the boolean state of the --help, --usage and --?
 options (true if any of these options were passed on the command line).
 
-=head2 B<meta>
+=item B<meta>
 
 This returns the role meta object.
+
+=back
 
 =head1 AUTHORS
 
 =over 4
 
-=item *
-
-NAKAGAWA Masaki <masaki@cpan.org>
-
-=item *
-
-FUJI Goro <gfuji@cpan.org>
-
-=item *
-
-Stevan Little <stevan@iinteractive.com>
-
-=item *
-
-Brandon L. Black <blblack@gmail.com>
-
-=item *
-
-Yuval Kogman <nothingmuch@woobling.org>
-
-=item *
-
-Ryan D Johnson <ryan@innerfence.com>
-
-=item *
-
-Drew Taylor <drew@drewtaylor.com>
-
-=item *
-
-Tomas Doran <bobtfish@bobtfish.net>
-
-=item *
-
-Florian Ragwitz <rafl@debian.org>
-
-=item *
-
-Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
-
-=item *
-
-Avar Arnfjord Bjarmason <avar@cpan.org>
-
-=item *
-
-Chris Prather <perigrin@cpan.org>
-
-=item *
-
-Mark Gardner <mjgardner@cpan.org>
+=item NAKAGAWA Masaki <masaki@cpan.org>
+=item FUJI Goro <gfuji@cpan.org>
+=item Stevan Little <stevan@iinteractive.com>
+=item Brandon L. Black <blblack@gmail.com>
+=item Yuval Kogman <nothingmuch@woobling.org>
+=item Ryan D Johnson <ryan@innerfence.com>
+=item Drew Taylor <drew@drewtaylor.com>
+=item Tomas Doran <bobtfish@bobtfish.net>
+=item Florian Ragwitz <rafl@debian.org>
+=item Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
+=item Avar Arnfjord Bjarmason <avar@cpan.org>
+=item Chris Prather <perigrin@cpan.org>
+=item Mark Gardner <mjgardner@cpan.org>
+=item Tokuhiro Matsuno <tokuhirom@cpan.org>
 
 =back
 
@@ -316,4 +269,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

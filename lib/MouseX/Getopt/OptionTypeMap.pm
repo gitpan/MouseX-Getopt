@@ -1,10 +1,4 @@
 package MouseX::Getopt::OptionTypeMap;
-BEGIN {
-  $MouseX::Getopt::OptionTypeMap::AUTHORITY = 'cpan:STEVAN';
-}
-{
-  $MouseX::Getopt::OptionTypeMap::VERSION = '0.34';
-}
 # ABSTRACT: Storage for the option to type mappings
 
 use Mouse 'confess', 'blessed';
@@ -77,93 +71,19 @@ no Mouse;
 
 1;
 
-
-__END__
-=pod
-
-=encoding utf-8
-
-=head1 NAME
-
-MouseX::Getopt::OptionTypeMap - Storage for the option to type mappings
-
 =head1 DESCRIPTION
 
 See the I<Custom Type Constraints> section in the L<MouseX::Getopt> docs
 for more info about how to use this module.
 
-=head1 METHODS
-
-=head2 B<has_option_type ($type_or_name)>
-
-=head2 B<get_option_type ($type_or_name)>
-
-=head2 B<add_option_type_to_map ($type_name, $option_spec)>
-
-=head1 AUTHORS
-
 =over 4
 
-=item *
+=item B<has_option_type ($type_or_name)>
 
-NAKAGAWA Masaki <masaki@cpan.org>
+=item B<get_option_type ($type_or_name)>
 
-=item *
-
-FUJI Goro <gfuji@cpan.org>
-
-=item *
-
-Stevan Little <stevan@iinteractive.com>
-
-=item *
-
-Brandon L. Black <blblack@gmail.com>
-
-=item *
-
-Yuval Kogman <nothingmuch@woobling.org>
-
-=item *
-
-Ryan D Johnson <ryan@innerfence.com>
-
-=item *
-
-Drew Taylor <drew@drewtaylor.com>
-
-=item *
-
-Tomas Doran <bobtfish@bobtfish.net>
-
-=item *
-
-Florian Ragwitz <rafl@debian.org>
-
-=item *
-
-Dagfinn Ilmari Mannsaker <ilmari@ilmari.org>
-
-=item *
-
-Avar Arnfjord Bjarmason <avar@cpan.org>
-
-=item *
-
-Chris Prather <perigrin@cpan.org>
-
-=item *
-
-Mark Gardner <mjgardner@cpan.org>
+=item B<add_option_type_to_map ($type_name, $option_spec)>
 
 =back
 
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Infinity Interactive, Inc.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
-
